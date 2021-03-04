@@ -1,7 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Practica1</string>
+    <string name="app_name">Mystagram</string>
     <string name="userText">User</string>
     <string name="passText">Password</string>
     <string name="loginButton">LOGIN</string>
+    <string name="registerText">New to Mystagram? Click to register</string>
+    <string name="rgTextView">Sign up to see the photos of your friends.</string>
+    <string name="rgEmail">Email</string>
+    <string name="rgNomCom">Full Name</string>
+    <string name="rgUsuario">User</string>
+    <string name="rgPassword">Password</string>
+    <string name="rgButtonRegister">Register</string>
+    <string name="rgFaltanCampos">It is mandatory to fill all the fields!!</string>
+    <string name="rgCorreoIncorrecto">The email entered is incorrect</string>
+    <string name="rgLongitudInc" translatable="false">Password length must be at least 4 characters</string>
+    <string name="rgAlertContinuar">CONTINUE</string>
+    <string name="rgAlertTitle">Register failed</string>
+    <string name="rgExisteUser">User entered already exists</string>
+    <string name="rgFinRgTitle">Register completed</string>
+    <string name="rgFinMsg">"User has been successfully registered!! "</string>
+    <string name="rgFinAction">BACK TO HOME</string>
+    <string name="lgAlertTitle">Failed to login</string>
+    <string name="lgClaveIncorrecta">The password entered is incorrect</string>
+    <string name="lgUsuNoExiste">The user entered does not exist</string>
+    <string name="lgAlertRegistrar">REGISTER</string>
 </resources>

@@ -1,6 +1,26 @@
 <resources>
-    <string name="app_name">Practica1</string>
+    <string name="app_name">Mystagram</string>
     <string name="userText">Usuario</string>
     <string name="passText">Contraseña</string>
-    <string name="loginButton">INICIAR SESION</string>
+    <string name="loginButton">ACCEDER</string>
+    <string name="registerText">¿Nuevo en Mystagram? Pulsa para registrarte</string>
+    <string name="rgTextView">Regístrate para ver las fotos de tus amigos.</string>
+    <string name="rgEmail">Correo electrónico</string>
+    <string name="rgNomCom">Nombre Completo</string>
+    <string name="rgUsuario">Nombre de Usuario</string>
+    <string name="rgPassword">Contraseña</string>
+    <string name="rgButtonRegister">Registrar</string>
+    <string name="rgFaltanCampos">Es obligatorio rellenar todos los campos!!</string>
+    <string name="rgCorreoIncorrecto">El correo electronico introducido es incorrecto</string>
+    <string name="rgLongitudInc">La longitud de la contraseña debe ser de al menos 4 caracteres</string>
+    <string name="rgAlertContinuar">CONTINUAR</string>
+    <string name="rgAlertTitle">Error al registrar</string>
+    <string name="rgExisteUser">El usuario introducido ya existe</string>
+    <string name="rgFinRgTitle">Registro completado</string>
+    <string name="rgFinMsg">Se ha registrado el usuario correctamente!!</string>
+    <string name="rgFinAction">VOLVER AL INICIO</string>
+    <string name="lgAlertTitle">Error al iniciar sesión</string>
+    <string name="lgClaveIncorrecta">La contraseña introducida es incorrecta</string>
+    <string name="lgUsuNoExiste">El Usuario introducido no existe</string>
+    <string name="lgAlertRegistrar">REGISTRAR</string>
 </resources>

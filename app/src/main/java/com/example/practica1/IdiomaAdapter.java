@@ -9,17 +9,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class IdiomaAdapter extends RecyclerView.Adapter<IdiomaHolder> {
         private int[] lasimagenes;
-        public IdiomaAdapter (int[] imagenes)
+        private String[] idiomas;
+        public IdiomaAdapter (int[] imagenes,String[] lIdiomas)
         {
             lasimagenes=imagenes;
+            idiomas=lIdiomas;
         }
 
         public IdiomaHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View elLayoutDeCadaItem= LayoutInflater.from(parent.getContext()).inflate(R.layout.idioma_card_layout,null);
             IdiomaHolder evh = new IdiomaHolder(elLayoutDeCadaItem);
+            evh.idiomas=idiomas;
             return evh;
         }
-
         @Override
         public void onBindViewHolder(@NonNull IdiomaHolder holder, int position) {
             holder.laimagen.setImageResource(lasimagenes[position]);
