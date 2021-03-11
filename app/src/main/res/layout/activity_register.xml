@@ -10,7 +10,7 @@
         android:id="@+id/logoView2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
+        android:layout_marginTop="84dp"
         android:fontFamily="@font/milky_matcha"
         android:text="MYSTAGRAM"
         android:textSize="36sp"
@@ -19,29 +19,50 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
-        android:id="@+id/rgTextView"
-        android:layout_width="256dp"
-        android:layout_height="55dp"
-        android:layout_marginTop="4dp"
-        android:text="@string/rgTextView"
-        android:textAlignment="center"
-        android:textSize="18sp"
+    <EditText
+        android:id="@+id/rgPasswordText"
+        android:layout_width="251dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:ems="10"
+        android:hint="@string/rgPassword"
+        android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/logoView2" />
+        app:layout_constraintTop_toBottomOf="@+id/rgUsuarioText" />
+
+    <EditText
+        android:id="@+id/rgUsuarioText"
+        android:layout_width="251dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:ems="10"
+        android:hint="@string/rgUsuario"
+        android:inputType="textPersonName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rgNomComText" />
+
+    <Button
+        android:id="@+id/buttonRegister"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:text="@string/rgButtonRegister"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/rgPasswordText" />
 
     <EditText
         android:id="@+id/rgEmailText"
         android:layout_width="251dp"
         android:layout_height="50dp"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="24dp"
         android:ems="10"
         android:hint="@string/rgEmail"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rgTextView" />
 
@@ -49,49 +70,25 @@
         android:id="@+id/rgNomComText"
         android:layout_width="251dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="32dp"
         android:ems="10"
         android:hint="@string/rgNomCom"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/rgEmailText" />
 
-    <EditText
-        android:id="@+id/rgUsuarioText"
-        android:layout_width="251dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:ems="10"
-        android:hint="@string/rgUsuario"
-        android:inputType="textPersonName"
+    <TextView
+        android:id="@+id/rgTextView"
+        android:layout_width="256dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="12dp"
+        android:text="@string/rgTextView"
+        android:textAlignment="center"
+        android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.497"
+        app:layout_constraintHorizontal_bias="0.496"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgNomComText" />
-
-    <EditText
-        android:id="@+id/rgPasswordText"
-        android:layout_width="251dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="28dp"
-        android:ems="10"
-        android:hint="@string/rgPassword"
-        android:inputType="textPassword"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgUsuarioText" />
-
-    <Button
-        android:id="@+id/buttonRegister"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text="@string/rgButtonRegister"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgPasswordText" />
+        app:layout_constraintTop_toBottomOf="@+id/logoView2" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

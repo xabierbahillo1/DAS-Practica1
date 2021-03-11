@@ -24,4 +24,5 @@
     <string name="lgClaveIncorrecta">The password entered is incorrect</string>
     <string name="lgUsuNoExiste">The user entered does not exist</string>
     <string name="lgAlertRegistrar">REGISTER</string>
+    <string name="pUltImage">Last uploaded photos</string>
 </resources>
