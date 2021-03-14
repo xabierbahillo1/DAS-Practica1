@@ -24,4 +24,7 @@
     <string name="lgUsuNoExiste">El Usuario introducido no existe</string>
     <string name="lgAlertRegistrar">REGISTRAR</string>
     <string name="pUltImage">Últimas fotos subidas</string>
+    <string name="pSubirFoto">¿Desea subir la siguiente foto?</string>
+    <string name="pAccSubirFoto">Subir foto</string>
+    <string name="pCancSubirFoto">Cancelar</string>
 </resources>

@@ -39,17 +39,17 @@ public class RegisterActivity extends AppCompatActivity {
                 boolean registrado=false;
                 if (correo.equals("") || nomCom.equals("") || usuario.equals("") || password.equals("")){ //Si alguno de los campos esta vacio
                     //Devuelvo dialog indicandolo
-                    DialogFragment dialogoFaltanCampos= new DialogFalloRegistro(getString(R.string.rgFaltanCampos));
+                    DialogFragment dialogoFaltanCampos= DialogFalloRegistro.newInstance(getString(R.string.rgFaltanCampos));
                     dialogoFaltanCampos.show(getSupportFragmentManager(), "faltanCampos");
                 }
                 else{ //Comienza proceso registrar
                     if (!comprobarCorreo(correo)){ //Comprueba la estructura del correo
-                        DialogFragment dialogoCorreoIncorrecto= new DialogFalloRegistro(getString(R.string.rgCorreoIncorrecto));
+                        DialogFragment dialogoCorreoIncorrecto= DialogFalloRegistro.newInstance(getString(R.string.rgCorreoIncorrecto));
                         dialogoCorreoIncorrecto.show(getSupportFragmentManager(), "correoIncorrecto");
                     }
                     else {
                         if (password.length()<4){ //Clave demasiado corta
-                            DialogFragment dialogoClaveIncorrecta= new DialogFalloRegistro(getString(R.string.rgLongitudInc));
+                            DialogFragment dialogoClaveIncorrecta= DialogFalloRegistro.newInstance(getString(R.string.rgLongitudInc));
                             dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
                         }
                         else{
@@ -57,7 +57,7 @@ public class RegisterActivity extends AppCompatActivity {
                             SQLiteDatabase bd = GestorDB.getWritableDatabase();
                             Cursor c = bd.rawQuery("SELECT Usuario FROM Usuarios WHERE Usuario=\'"+usuario+"\'", null);
                             if (c.moveToFirst()){ //Si cursor no esta vacio, existe el usuario
-                                DialogFragment dialogoExisteUsuario= new DialogFalloRegistro(getString(R.string.rgExisteUser));
+                                DialogFragment dialogoExisteUsuario= DialogFalloRegistro.newInstance(getString(R.string.rgExisteUser));
                                 dialogoExisteUsuario.show(getSupportFragmentManager(), "usuarioExiste");
                             }
                             else{ //No existe el usuario

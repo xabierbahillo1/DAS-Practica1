@@ -15,6 +15,7 @@ public class miBD extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         sqLiteDatabase.execSQL("CREATE TABLE Usuarios ('Usuario' VARCHAR(30) PRIMARY KEY NOT NULL, 'Correo' VARCHAR(120), 'NombreCompleto' VARCHAR(40),'Clave' VARCHAR(30))");
+        sqLiteDatabase.execSQL("CREATE TABLE FotosUsuario ('fotoid' INTEGER, 'usuario' VARCHAR(30) NOT NULL,'img' BLOB, PRIMARY KEY('fotoid','usuario'))");
     }
 
     @Override

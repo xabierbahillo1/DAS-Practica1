@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
                 boolean login=false;
                 if (usuario.equals("") || password.equals("")){ //Si alguno de los campos esta vacio
                     //Devuelvo dialog indicandolo
-                    DialogFragment dialogoFaltanCampos= new DialogFalloLogin(getString(R.string.rgFaltanCampos));
+                    DialogFragment dialogoFaltanCampos= DialogFalloLogin.newInstance(getString(R.string.rgFaltanCampos));
                     dialogoFaltanCampos.show(getSupportFragmentManager(), "faltanCampos");
                 }
                 else{ //Procedimiento login
@@ -53,7 +53,7 @@ public class MainActivity extends AppCompatActivity {
                             login=true;
                         }
                         else{
-                            DialogFragment dialogoClaveIncorrecta= new DialogFalloLogin(getString(R.string.lgClaveIncorrecta));
+                            DialogFragment dialogoClaveIncorrecta= DialogFalloLogin.newInstance(getString(R.string.lgClaveIncorrecta));
                             dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
                         }
                         c.close();
@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity {
                 if (login){ //Si el login ha sido correcto
                     finish();
                     Intent i = new Intent(getApplicationContext(), ActivityPrincipal.class);
+                    i.putExtra("usuario",usuario);
                     startActivity(i);
                 }
             }
