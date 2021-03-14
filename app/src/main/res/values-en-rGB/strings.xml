@@ -28,4 +28,7 @@
     <string name="pSubirFoto">Do you want to upload the next photo?</string>
     <string name="pAccSubirFoto">Upload photo</string>
     <string name="pCancSubirFoto">Cancel</string>
+    <string name="pAccBorrarFoto">Delete photo</string>
+    <string name="pTxtBorrarFoto">Are you sure you want to delete the photo?</string>
+    <string name="pToastBorrarFoto">The photo has been deleted successfully!</string>
 </resources>

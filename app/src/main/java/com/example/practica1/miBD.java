@@ -14,8 +14,10 @@ public class miBD extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        //Se crean las tablas Usuarios y Fotousuario
         sqLiteDatabase.execSQL("CREATE TABLE Usuarios ('Usuario' VARCHAR(30) PRIMARY KEY NOT NULL, 'Correo' VARCHAR(120), 'NombreCompleto' VARCHAR(40),'Clave' VARCHAR(30))");
-        sqLiteDatabase.execSQL("CREATE TABLE FotosUsuario ('fotoid' INTEGER, 'usuario' VARCHAR(30) NOT NULL,'img' BLOB, PRIMARY KEY('fotoid','usuario'))");
+        sqLiteDatabase.execSQL("CREATE TABLE FotosUsuario ('fotoid' INTEGER PRIMARY KEY AUTOINCREMENT, 'usuario' VARCHAR(30) NOT NULL,'img' BLOB)");
+        sqLiteDatabase.execSQL("INSERT INTO Usuarios(Usuario,Correo,NombreCompleto,Clave) VALUES ('prueba','prueba@correo.com','Usuario Pruebas','prueba')"); //Usuario por defecto para pruebas
     }
 
     @Override

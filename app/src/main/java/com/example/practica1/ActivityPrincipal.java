@@ -43,6 +43,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         rv.setLayoutManager(elLayoutLineal);
         tratarListaFotos();
 
+
     }
     @Override
 
@@ -76,29 +77,36 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         //Obtiene las fotos subidas desde la base de datos
 
         RecyclerView rv = (RecyclerView)findViewById(R.id.listaFotos);
-        //Obtengo las dos listas (usuarios: Lista con el usuario que ha subido la foto, fotos: Lista con las fotos subidas)
+        //Obtengo las listas (usuarios: Lista con el nombre de usuario que ha subido la foto, fotos: Lista con las fotos subidas, codusuario= Usuario que ha subido la foto
+        //idFotos Id de referencia a la foto
         miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
         SQLiteDatabase bd = GestorDB.getReadableDatabase();
-        Cursor c = bd.rawQuery("SELECT a.NombreCompleto,b.img FROM Usuarios a, FotosUsuario b WHERE a.Usuario = b.usuario ORDER BY fotoid DESC", null); //Muestro primero las ultimas fotos subidas
+        Cursor c = bd.rawQuery("SELECT a.NombreCompleto,b.img,a.Usuario,b.fotoid FROM Usuarios a, FotosUsuario b WHERE a.Usuario = b.usuario ORDER BY fotoid DESC", null); //Muestro primero las ultimas fotos subidas
         String[] usuarios=new String[c.getCount()];
         Bitmap[] fotos= new Bitmap[c.getCount()];
+        String[] codusuario= new String[c.getCount()];
+        int[] idFotos= new int[c.getCount()];
         int i=0;
         while (c.moveToNext()){
             String subido= c.getString(0); //Usuario que ha subido la foto
             byte[] blob= c.getBlob(1); //Foto
+            String usuario= c.getString(2); //Codigo de usuario que ha subido la foto
+            int idFoto= c.getInt(3); //Id de referencia a la foto
             //Convierto la foto en un bitmap para despues cargarlo en el ImageView
             ByteArrayInputStream bais = new ByteArrayInputStream(blob);
             Bitmap bitmap = BitmapFactory.decodeStream(bais);
             bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/2,bitmap.getHeight()/2,true); //Reescalado para evitar consumir muchos recursos
             usuarios[i]=subido;
             fotos[i]=bitmap;
+            codusuario[i]=usuario;
+            idFotos[i]=idFoto;
             i++;
             if (i==10){ //Solo muestro las 10 últimas fotos subidas (para evitar consumir muchos recursos)
                 break;
             }
         }
         //Cargo los datos en el adaptador del recyclerview
-        FotoAdapter eladaptador = new FotoAdapter(usuarios,fotos);
+        FotoAdapter eladaptador = new FotoAdapter(this,usuarios,fotos,codusuario,idFotos,usuario);
         c.close();
         bd.close();
         rv.setAdapter(eladaptador);

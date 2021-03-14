@@ -19,6 +19,7 @@ public class FotoHolder extends RecyclerView.ViewHolder {
                 @Override
                 public void onClick(View view) { //Accion cuando haces clic
                     getAdapterPosition();
+
                 }
             });
         }
