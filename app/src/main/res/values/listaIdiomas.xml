@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+        <string-array name="idiomas">
+            <item>@string/idiomaEsp</item>
+            <item>@string/idiomaEng</item>
+        </string-array>
+        <string-array name="codigosIdiomas">
+            <item>ESP</item>
+            <item>ENG</item>
+        </string-array>
+</resources>

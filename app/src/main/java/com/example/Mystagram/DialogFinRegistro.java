@@ -1,4 +1,4 @@
-package com.example.practica1;
+package com.example.Mystagram;
 
 import android.app.AlertDialog;
 import android.app.Dialog;

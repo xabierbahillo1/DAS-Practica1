@@ -1,6 +1,7 @@
-package com.example.practica1;
+package com.example.Mystagram;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.util.Log;
@@ -10,7 +11,7 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.fragment.app.DialogFragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
@@ -42,7 +43,14 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
         public void onBindViewHolder(@NonNull FotoHolder holder, int position) {
             //Muestro la imagen y texto correspondientes
             holder.laimagen.setImageBitmap(lasimagenes[position]);
-            holder.elTexto.setText(" "+lassubido[position]);
+            String texto=" "+lassubido[position];
+            //Obtengo las preferencias para saber si hay que mostrar el nombre de usuario o no
+            SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+            Boolean mostrarUsuario = prefs.getBoolean("mostrarUsuarios", false);
+            if (mostrarUsuario){ //Se muestra el nombre de usuario entre parentesis
+                texto+=" ("+codigosUsuarios[position]+")";
+            }
+            holder.elTexto.setText(texto);
             //Defino accion de pulsación larga (borrar la imagen si el usuario que pulsa de forma larga es el que subio la foto)
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

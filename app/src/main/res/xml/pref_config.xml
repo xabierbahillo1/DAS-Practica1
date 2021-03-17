@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <PreferenceCategory
+        app:title="@string/menuPreferencias"
+
+        />
+    <ListPreference
+        app:dialogTitle="@string/prefIdioma"
+        app:entries="@array/idiomas"
+        app:entryValues="@array/codigosIdiomas"
+        app:key="idiomaApp"
+        app:title="@string/prefTitIdioma"
+        app:summary="@string/prefIdioma"/>
+    <CheckBoxPreference
+        app:key="mostrarUsuarios"
+        app:title="@string/prefUsuario"
+        app:summary="@string/prefUsuarioLong" />
+
+
+</PreferenceScreen>

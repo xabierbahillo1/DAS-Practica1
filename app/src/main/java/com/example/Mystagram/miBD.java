@@ -1,4 +1,4 @@
-package com.example.practica1;
+package com.example.Mystagram;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
@@ -18,6 +18,7 @@ public class miBD extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("CREATE TABLE Usuarios ('Usuario' VARCHAR(30) PRIMARY KEY NOT NULL, 'Correo' VARCHAR(120), 'NombreCompleto' VARCHAR(40),'Clave' VARCHAR(30))");
         sqLiteDatabase.execSQL("CREATE TABLE FotosUsuario ('fotoid' INTEGER PRIMARY KEY AUTOINCREMENT, 'usuario' VARCHAR(30) NOT NULL,'img' BLOB)");
         sqLiteDatabase.execSQL("INSERT INTO Usuarios(Usuario,Correo,NombreCompleto,Clave) VALUES ('prueba','prueba@correo.com','Usuario Pruebas','prueba')"); //Usuario por defecto para pruebas
+        sqLiteDatabase.execSQL("INSERT INTO Usuarios(Usuario,Correo,NombreCompleto,Clave) VALUES ('admin','admin@correo.com','Administrador','password')"); //Usuario administrador
     }
 
     @Override

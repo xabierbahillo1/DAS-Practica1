@@ -4,6 +4,16 @@
 
     <item
         android:id="@+id/subirFoto"
-        android:title="Subir foto"
+        android:title="@string/menuSubirFoto"
         app:showAsAction="always" />
+    <item
+        android:id="@+id/exportarDatos"
+        android:title="@string/menuExportarDatos"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/preferencias"
+        android:title="@string/menuPreferencias"
+        app:showAsAction="never" />
+
+
 </menu>

@@ -13,7 +13,7 @@
     <string name="rgButtonRegister">Register</string>
     <string name="rgFaltanCampos">It is mandatory to fill all the fields!!</string>
     <string name="rgCorreoIncorrecto">The email entered is incorrect</string>
-    <string name="rgLongitudInc" translatable="false">Password length must be at least 4 characters</string>
+    <string name="rgLongitudInc">Password length must be at least 4 characters</string>
     <string name="rgAlertContinuar">CONTINUE</string>
     <string name="rgAlertTitle">Register failed</string>
     <string name="rgExisteUser">User entered already exists</string>
@@ -37,8 +37,8 @@
     <string name="prefTitIdioma">Language</string>
     <string name="idiomaEsp">Spanish</string>
     <string name="idiomaEng">English</string>
-    <string name="prefUsuarioLong">Check this option if you want to show usernames in the application</string>
     <string name="prefUsuario">Show usernames</string>
+    <string name="prefUsuarioLong">Check this option if you want to show usernames in the application</string>
     <string name="menuExportarDatos">Export Data</string>
     <string name="exportarDatosOK">User data has been successfully exported</string>
     <string name="exportarDatosErr">An error occurred while exporting data</string>

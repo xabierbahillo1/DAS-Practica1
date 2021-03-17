@@ -1,32 +1,37 @@
-package com.example.practica1;
+package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.Activity;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ImageView;
+import android.widget.Toast;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.util.Locale;
 
 public class ActivityPrincipal extends AppCompatActivity implements DialogPreviewFoto.ListenerdelDialogo {
     private String usuario; //Usuario que ha iniciado sesion
+    private String idioma; //Idioma de la aplicacion
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,13 +42,14 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         if (extras!= null){
             usuario=extras.getString("usuario");
         }
+        //Obtengo el idioma actual de la aplicacion
+        idioma=obtenerIdioma();
+
         //Cargo el recyclerview con las fotos subidas
         RecyclerView rv = (RecyclerView)findViewById(R.id.listaFotos);
         LinearLayoutManager elLayoutLineal= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
         rv.setLayoutManager(elLayoutLineal);
         tratarListaFotos();
-
-
     }
     @Override
 
@@ -59,6 +65,16 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             case R.id.subirFoto:{
                 Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, 1); //Codigo 1 para recuperar la imagen
+                break;
+            }
+            case R.id.preferencias:{ //Abre el activity para modificar las preferencias
+                Intent i = new Intent(getApplicationContext(), PreferencesActivity.class);
+                startActivity(i);
+                break;
+            }
+            case R.id.exportarDatos:{
+                exportarDatosATxt(); //Exporta los datos de los usuarios del sistema a un TXT
+                break;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -132,9 +148,99 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
     protected void onSaveInstanceState(Bundle outState){ //Guardo los datos del usuario que ha iniciado sesion
         super.onSaveInstanceState(outState);
         outState.putString("usuario", usuario);
+        outState.putString("idioma", idioma);
     }
     protected void onRestoreInstanceState(Bundle savedInstanceState){
         super.onRestoreInstanceState(savedInstanceState);
         usuario = savedInstanceState.getString("usuario");
+        idioma = savedInstanceState.getString("idioma");
+        cambiarIdioma(idioma);
+    }
+
+    public void onResume() {
+
+        super.onResume();
+
+        //Si cambia el idioma recargo la pagina
+        String nuevoIdioma=obtenerIdioma();
+        if (!idioma.equals(nuevoIdioma)){
+            cambiarIdioma(nuevoIdioma);
+        }
+        tratarListaFotos(); //Actualizo la lista de fotos
+    }
+
+    public String obtenerIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        return prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+    }
+    private void cambiarIdioma(String idioma){
+        Locale nuevaloc= new Locale("es"); //Por defecto español
+        if (idioma.equals("ENG")){ //Si el idioma es ingles
+            nuevaloc = new Locale("en","GB");
+        }
+        Locale.setDefault(nuevaloc);
+        Configuration configuration =
+                getBaseContext().getResources().getConfiguration();
+        configuration.setLocale(nuevaloc);
+        configuration.setLayoutDirection(nuevaloc);
+        Context context =
+                getBaseContext().createConfigurationContext(configuration);
+        getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
+        finish();
+        startActivity(getIntent());
+    }
+
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem exportData = menu.findItem(R.id.exportarDatos);
+        if(usuario.equals("admin")) //Si el usuario es el administrador muestro la opcion de exportar datos
+        {
+            exportData.setVisible(true);
+        }
+        else //Si no es administrador, oculto la opcion de exportar datos
+        {
+            exportData.setVisible(false);
+        }
+        return true;
+    }
+
+    private void exportarDatosATxt(){
+        //Exporta los datos de los usuarios de la app a un TXT
+
+        String texto="CodigoUsuario;CorreoElectronico;NombreCompleto;NumeroFotos"; //Escribo la cabecera del fichero
+        //Obtengo los datos de los usuarios
+        miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
+        SQLiteDatabase bd = GestorDB.getReadableDatabase();
+        Cursor c = bd.rawQuery("SELECT a.Usuario,a.Correo, a.NombreCompleto, IFNULL(b.numFotos,0) " +
+                                    "FROM Usuarios a LEFT JOIN (SELECT b.usuario, COUNT(1) numFotos " +
+                                                        "FROM FotosUsuario b GROUP BY b.usuario) b " +
+                                    "ON a.Usuario = b.usuario " +
+                                    "ORDER BY a.Usuario", null); //Obtengo los datos de todos los usuarios
+        while (c.moveToNext()) {
+            String codUsuario = c.getString(0); //Usuario
+            String correoUsurio = c.getString(1); //Correo electronico del usuario
+            String nombreusuario = c.getString(2); //NombreCompleto del usuario
+            int numFotos = c.getInt(3); //Numero de fotos subidas por el usuario
+            texto+="\n"+codUsuario+";"+correoUsurio+";"+nombreusuario+";"+numFotos;
+        }
+        //Escribo en el fichero
+        try {
+            OutputStreamWriter fichero = new OutputStreamWriter(openFileOutput("datosUsuarios.txt",
+                    Context.MODE_PRIVATE));
+            fichero.write(texto);
+            fichero.close();
+            //Escritura correcta, informo con un toast
+            Toast toastOK =
+                    Toast.makeText(this,
+                            getString((R.string.exportarDatosOK)), Toast.LENGTH_SHORT);
+            toastOK.show();
+        } catch (IOException e){
+            //Algun error, informo con un toast
+            Toast toastError =
+                    Toast.makeText(this,
+                            getString((R.string.exportarDatosErr)), Toast.LENGTH_SHORT);
+
+            toastError.show();
+            }
     }
 }

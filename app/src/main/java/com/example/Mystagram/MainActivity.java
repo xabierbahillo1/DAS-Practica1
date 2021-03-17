@@ -1,22 +1,30 @@
-package com.example.practica1;
+package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.preference.PreferenceManager;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+
+import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        //Gestiono el idioma
+        gestionarIdioma();
         //Definicion de eventos
         TextView textRegister= findViewById(R.id.registerText);
         textRegister.setOnClickListener(new View.OnClickListener() {
@@ -74,5 +82,60 @@ public class MainActivity extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    public void gestionarIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String idioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+        if (idioma.equals("DEF")) { //No hay ningun idioma en preferencias, asigno uno para seleccionar idioma de la app
+            String idiomaSistema=Locale.getDefault().getLanguage(); //Obtengo el idioma del sistema
+            SharedPreferences.Editor editor= prefs.edit();
+            switch (idiomaSistema){
+                case "en":{ //Si el idioma por defecto es ingles, cambio el idioma de la app a ingles
+                    editor.putString("idiomaApp","ENG");
+                    cambiarIdioma("ENG");
+                    break;
+                }
+                default:{ //Por defecto pongo esp
+                    editor.putString("idiomaApp","ESP");
+                    cambiarIdioma("ESP");
+                    break;
+                }
+            }
+            editor.apply();
+        }
+        else{
+            LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
+            String idiomaApp=locale.get(0).toString();
+            if (idiomaApp.equals("es")){
+                idiomaApp="ESP";
+            }
+            if (idiomaApp.equals("en")){
+                idiomaApp="ENG";
+            }
+            if (idiomaApp.equals("en_GB")){
+                idiomaApp="ENG";
+            }
+            if (!idiomaApp.equals(idioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
+                cambiarIdioma(idioma);
+            }
+
+        }
+    }
+    private void cambiarIdioma(String idioma){
+        Locale nuevaloc= new Locale("es"); //Por defecto español
+        if (idioma.equals("ENG")){ //Si el idioma es ingles
+            nuevaloc = new Locale("en","GB");
+        }
+        Locale.setDefault(nuevaloc);
+        Configuration configuration =
+                getBaseContext().getResources().getConfiguration();
+        configuration.setLocale(nuevaloc);
+        configuration.setLayoutDirection(nuevaloc);
+        Context context =
+                getBaseContext().createConfigurationContext(configuration);
+        getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
+        finish();
+        startActivity(getIntent());
     }
 }

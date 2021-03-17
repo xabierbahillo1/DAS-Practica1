@@ -30,4 +30,15 @@
     <string name="pAccBorrarFoto">Borrar foto</string>
     <string name="pTxtBorrarFoto">¿Estas seguro de que quieres borrar la foto?</string>
     <string name="pToastBorrarFoto">Se ha borrado la foto correctamente!</string>
+    <string name="menuSubirFoto">Subir foto</string>
+    <string name="menuPreferencias">Preferencias</string>
+    <string name="prefIdioma">Elige el idioma de la aplicación</string>
+    <string name="prefTitIdioma">Idioma</string>
+    <string name="idiomaEsp">Español</string>
+    <string name="idiomaEng">Inglés</string>
+    <string name="prefUsuario">Mostrar nombres de usuario</string>
+    <string name="prefUsuarioLong">Marca esta opción si deseas mostrar los nombres de usuario en la aplicación</string>
+    <string name="menuExportarDatos">Exportar Datos</string>
+    <string name="exportarDatosOK">Se han exportado los datos de los usuarios correctamente</string>
+    <string name="exportarDatosErr">Ha ocurrido algún error al exportar los datos</string>
 </resources>
