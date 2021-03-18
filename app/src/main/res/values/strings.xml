@@ -41,4 +41,6 @@
     <string name="menuExportarDatos">Exportar Datos</string>
     <string name="exportarDatosOK">Se han exportado los datos de los usuarios correctamente</string>
     <string name="exportarDatosErr">Ha ocurrido algún error al exportar los datos</string>
+    <string name="notificacionFotoSubidaTxt">Has subido una foto a Mystagram!!</string>
+    <string name="notificacionRegistro">Te has registrado en Mystagram!! Esperamos verte pronto.</string>
 </resources>

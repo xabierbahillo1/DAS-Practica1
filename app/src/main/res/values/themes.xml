@@ -13,4 +13,9 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <style name="CustomButton" parent="@style/Theme.Practica1">
+        <item name="android:background">@drawable/ovalado</item>
+    </style>
+
 </resources>

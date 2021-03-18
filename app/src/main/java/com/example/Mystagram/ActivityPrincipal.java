@@ -1,11 +1,14 @@
 package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.DialogFragment;
-import androidx.preference.PreferenceManager;
+//import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -16,7 +19,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -143,6 +148,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         //Cierro la conexion a BD
         bd.close();
         tratarListaFotos(); //Actualizo el recyclerview
+        lanzarNotificacionFotoSubida();//Lanzo una notificacion indicando que se ha subido la foto
     }
 
     protected void onSaveInstanceState(Bundle outState){ //Guardo los datos del usuario que ha iniciado sesion
@@ -242,5 +248,21 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
 
             toastError.show();
             }
+    }
+    public void lanzarNotificacionFotoSubida(){
+        NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(this, "NotFotoSubida");
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { //Si version >= Android Oreo
+            NotificationChannel elCanal = new NotificationChannel("NotFotoSubida", "NotificacionFotoubida",
+                    NotificationManager.IMPORTANCE_DEFAULT);
+            elManager.createNotificationChannel(elCanal);
+        }
+        elBuilder.setSmallIcon(android.R.drawable.ic_menu_camera)
+                .setContentTitle("Mystagram")
+                .setContentText(getString(R.string.notificacionFotoSubidaTxt))
+                .setVibrate(new long[]{0, 1000, 500, 1000})
+                .setAutoCancel(true);
+        elManager.notify(1, elBuilder.build());
+
     }
 }
