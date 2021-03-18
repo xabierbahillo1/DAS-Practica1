@@ -64,20 +64,20 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         return true;
     }
 
-    public boolean onOptionsItemSelected(MenuItem item) {
+    public boolean onOptionsItemSelected(MenuItem item) { //Metodos barra
         int id=item.getItemId();
         switch (id){
-            case R.id.subirFoto:{
+            case R.id.subirFoto:{ //Si ha pulsado subir foto
                 Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
                 startActivityForResult(gallery, 1); //Codigo 1 para recuperar la imagen
                 break;
             }
-            case R.id.preferencias:{ //Abre el activity para modificar las preferencias
+            case R.id.preferencias:{ //Ha pulsado preferencias, Abre el activity para modificar las preferencias
                 Intent i = new Intent(getApplicationContext(), PreferencesActivity.class);
                 startActivity(i);
                 break;
             }
-            case R.id.exportarDatos:{
+            case R.id.exportarDatos:{ //Ha pulsado Exportar datos
                 exportarDatosATxt(); //Exporta los datos de los usuarios del sistema a un TXT
                 break;
             }
@@ -85,11 +85,12 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         return super.onOptionsItemSelected(item);
     }
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        //Ha finalizado un ActivityForResult, recupero la informacion
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1) { //Si se ha seleccionado correctamente una foto, se pregunta si realmente desea subirla.
             Uri imageUri = data.getData();
             String uriString=imageUri.toString();
-            DialogFragment dialogoPreviewFoto= DialogPreviewFoto.newInstance(uriString);
+            DialogFragment dialogoPreviewFoto= DialogPreviewFoto.newInstance(uriString); //Muestro en un dialog la foto a subir
             dialogoPreviewFoto.show(getSupportFragmentManager(), "previewFoto");
         }
     }
@@ -134,7 +135,10 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
     }
     public void subirFoto(Bitmap bitmap){
         //Sube un bitmap a BD
-        //https://es.stackoverflow.com/questions/74332/guardar-imagenes-en-sqlite-android
+        /**EXTRAIDO DE STACK OVERFLOW
+        Pregunta: https://es.stackoverflow.com/questions/74332/guardar-imagenes-en-sqlite-android
+         Autor: https://es.stackoverflow.com/users/26822/stefan-nolde
+         **/
         ByteArrayOutputStream baos = new ByteArrayOutputStream(6000);
         bitmap.compress(Bitmap.CompressFormat.JPEG, 10 , baos);
         byte[] blob = baos.toByteArray();

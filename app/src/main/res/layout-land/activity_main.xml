@@ -8,11 +8,13 @@
 
     <TextView
         android:id="@+id/logoView"
+        style="@style/titleMystagram"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="15dp"
         android:fontFamily="@font/milky_matcha"
         android:text="MYSTAGRAM"
+        android:textColor="#000000"
         android:textSize="36sp"
         app:layout_constraintBottom_toTopOf="@+id/userText"
         app:layout_constraintEnd_toEndOf="parent"
