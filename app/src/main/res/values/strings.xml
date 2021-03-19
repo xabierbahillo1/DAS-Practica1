@@ -44,4 +44,5 @@
     <string name="notificacionFotoSubidaTxt">Has subido una foto a Mystagram!!</string>
     <string name="notificacionRegistro">Te has registrado en Mystagram!! Esperamos verte pronto.</string>
     <string name="prefTNumFotos">Número de fotos a visualizar</string>
+    <string name="tFotoPorDefecto">Foto Por Defecto</string>
 </resources>

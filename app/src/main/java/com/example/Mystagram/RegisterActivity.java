@@ -2,16 +2,22 @@ package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.preference.PreferenceManager;
 
 import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -95,5 +101,41 @@ public class RegisterActivity extends AppCompatActivity {
         else{
             return false;
         }
+    }
+    protected void onRestoreInstanceState(Bundle savedInstanceState){ //Si roto la pantalla
+        super.onRestoreInstanceState(savedInstanceState);
+        //Si el idioma de la aplicacion es diferente al que deberia mostrarse lo cambio
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String idioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+        LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
+        String idiomaApp=locale.get(0).toString();
+        if (idiomaApp.equals("es")){
+            idiomaApp="ESP";
+        }
+        if (idiomaApp.equals("en")){
+            idiomaApp="ENG";
+        }
+        if (idiomaApp.equals("en_GB")){
+            idiomaApp="ENG";
+        }
+        if (!idiomaApp.equals(idioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
+            cambiarIdioma(idioma);
+        }
+    }
+
+    private void cambiarIdioma(String idioma){
+        Locale nuevaloc= new Locale("es"); //Por defecto español
+        if (idioma.equals("ENG")){ //Si el idioma es ingles
+            nuevaloc = new Locale("en","GB");
+        }
+        Locale.setDefault(nuevaloc);
+        Configuration configuration =
+                getBaseContext().getResources().getConfiguration();
+        configuration.setLocale(nuevaloc);
+        configuration.setLayoutDirection(nuevaloc);
+        Context context =
+                getBaseContext().createConfigurationContext(configuration);
+        getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
+        recreate();
     }
 }

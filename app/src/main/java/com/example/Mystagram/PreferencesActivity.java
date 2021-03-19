@@ -7,6 +7,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.LocaleList;
 
 import java.util.Locale;
 
@@ -16,6 +17,22 @@ public class PreferencesActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preferences);
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
+        String idioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+        LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
+        String idiomaApp=locale.get(0).toString();
+        if (idiomaApp.equals("es")){
+            idiomaApp="ESP";
+        }
+        if (idiomaApp.equals("en")){
+            idiomaApp="ENG";
+        }
+        if (idiomaApp.equals("en_GB")){
+            idiomaApp="ENG";
+        }
+        if (!idiomaApp.equals(idioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
+            cambiarIdioma(idioma);
+        }
     }
     protected void onRestoreInstanceState(Bundle savedInstanceState){ //Si cambio a horizontal
         super.onRestoreInstanceState(savedInstanceState);

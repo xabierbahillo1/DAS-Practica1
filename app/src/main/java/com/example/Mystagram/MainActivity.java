@@ -135,7 +135,6 @@ public class MainActivity extends AppCompatActivity {
         Context context =
                 getBaseContext().createConfigurationContext(configuration);
         getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
-        finish();
-        startActivity(getIntent());
+        recreate();
     }
 }

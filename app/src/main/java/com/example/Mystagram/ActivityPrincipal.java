@@ -18,9 +18,11 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.LocaleList;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -49,7 +51,6 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         }
         //Obtengo el idioma actual de la aplicacion
         idioma=obtenerIdioma();
-
         //Cargo el recyclerview con las fotos subidas
         RecyclerView rv = (RecyclerView)findViewById(R.id.listaFotos);
         LinearLayoutManager elLayoutLineal= new LinearLayoutManager(this,LinearLayoutManager.VERTICAL,false);
@@ -109,6 +110,17 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         String[] codusuario= new String[c.getCount()];
         int[] idFotos= new int[c.getCount()];
         int i=0;
+        if (c.getCount()==0){ //Si es vacio, añado una foto de ejemplo
+            usuarios= new String[1];
+            fotos= new Bitmap[1];
+            codusuario= new String[1];
+            idFotos= new int[1];
+            usuarios[0]=getString(R.string.tFotoPorDefecto);
+            fotos[0]= BitmapFactory.decodeResource(this.getResources(),
+                    R.drawable.imagen1);
+            codusuario[0]="prueba";
+            idFotos[0]=-1;
+        }
         while (c.moveToNext()){
             String subido= c.getString(0); //Usuario que ha subido la foto
             byte[] blob= c.getBlob(1); //Foto
@@ -164,8 +176,26 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         super.onRestoreInstanceState(savedInstanceState);
         usuario = savedInstanceState.getString("usuario");
         idioma = savedInstanceState.getString("idioma");
-        cambiarIdioma(idioma);
+        SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String miidioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+        LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
+        String idiomaApp=locale.get(0).toString();
+        if (idiomaApp.equals("es")){
+            idiomaApp="ESP";
+        }
+        if (idiomaApp.equals("en")){
+            idiomaApp="ENG";
+        }
+        if (idiomaApp.equals("en_GB")){
+            idiomaApp="ENG";
+        }
+        if (!idiomaApp.equals(miidioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
+            cambiarIdioma(miidioma);
+            idioma=miidioma;
+        }
+
     }
+
 
     protected void onResume() {
 
@@ -174,9 +204,8 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         //Si cambia el idioma recargo la pagina
         String nuevoIdioma=obtenerIdioma();
         if (!idioma.equals(nuevoIdioma)){
-            cambiarIdioma(nuevoIdioma);
+            recreate();
         }
-        tratarListaFotos(); //Actualizo la lista de fotos
     }
 
     private String obtenerIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
@@ -196,8 +225,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         Context context =
                 getBaseContext().createConfigurationContext(configuration);
         getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
-        finish();
-        startActivity(getIntent());
+        recreate();
     }
 
     public boolean onPrepareOptionsMenu(Menu menu)
