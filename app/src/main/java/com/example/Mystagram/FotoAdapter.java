@@ -16,12 +16,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
 
-        private Bitmap[] lasimagenes;
-        private String[] lassubido;
-        private String[] codigosUsuarios;
-        private int[] ids;
-        private String miUsuario;
-        private Context context;
+        private Bitmap[] lasimagenes; //Bitmap con la imagen
+        private String[] lassubido; // Nombre del usuario que subio la imagen
+        private String[] codigosUsuarios; //Codigo del usuario que subio la imagen
+        private int[] ids; //Id de la imagen para identificarla
+        private String miUsuario; //Usuario que ha iniciado
+        private Context context; //Contexto (para lanzar toast)
+
         public FotoAdapter(Context appContext, String[] subido, Bitmap[] fotos,String[] usuarios, int[] idFotos, String elUsuario)
         {
             //Guardo informacion de las imagenes
@@ -36,7 +37,6 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
         public FotoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
             View elLayoutDeCadaItem= LayoutInflater.from(parent.getContext()).inflate(R.layout.foto_layout,null);
             FotoHolder evh = new FotoHolder(elLayoutDeCadaItem);
-            evh.subidos=lassubido;
             return evh;
         }
         @Override
@@ -83,7 +83,7 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
         public int getItemCount() {
             return lasimagenes.length;
         }
-        public void eliminarElementoEn(int pos){
+        private void eliminarElementoEn(int pos){
             //Metodo que elimina el elemento en la posicion i
             Bitmap[] nuevasimagenes= new Bitmap[lasimagenes.length-1];
             String[] nuevalassubido= new String[lassubido.length-1];

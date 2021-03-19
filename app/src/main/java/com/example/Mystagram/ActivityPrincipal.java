@@ -167,7 +167,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         cambiarIdioma(idioma);
     }
 
-    public void onResume() {
+    protected void onResume() {
 
         super.onResume();
 
@@ -179,7 +179,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         tratarListaFotos(); //Actualizo la lista de fotos
     }
 
-    public String obtenerIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
+    private String obtenerIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         return prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
     }
@@ -253,7 +253,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             toastError.show();
             }
     }
-    public void lanzarNotificacionFotoSubida(){
+    private void lanzarNotificacionFotoSubida(){
         NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(this, "NotFotoSubida");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { //Si version >= Android Oreo

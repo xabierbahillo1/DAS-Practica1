@@ -10,7 +10,6 @@ import androidx.recyclerview.widget.RecyclerView;
 public class FotoHolder extends RecyclerView.ViewHolder {
         public ImageView laimagen;
         public TextView elTexto;
-        public String[] subidos;
         public FotoHolder(@NonNull View itemView){
             super(itemView);
             laimagen=itemView.findViewById(R.id.cardImg);

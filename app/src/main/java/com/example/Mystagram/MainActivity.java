@@ -84,7 +84,7 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void gestionarIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
+    private void gestionarIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         String idioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
         if (idioma.equals("DEF")) { //No hay ningun idioma en preferencias, asigno uno para seleccionar idioma de la app
