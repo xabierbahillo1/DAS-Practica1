@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.GestorPreferencias;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -6,6 +6,8 @@ import android.content.res.Configuration;
 import android.os.Bundle;
 
 import androidx.preference.PreferenceFragmentCompat;
+
+import com.example.Mystagram.R;
 
 import java.util.Locale;
 

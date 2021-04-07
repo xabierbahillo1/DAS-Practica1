@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.GestorFotos;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -13,6 +13,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.Mystagram.R;
+import com.example.Mystagram.GestorBD.miBD;
 
 public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
 

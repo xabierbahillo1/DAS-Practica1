@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.GestorFotos;
 
 import android.view.View;
 import android.widget.ImageView;
@@ -6,6 +6,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.Mystagram.R;
 
 public class FotoHolder extends RecyclerView.ViewHolder {
         public ImageView laimagen;

@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.GestorBD;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;

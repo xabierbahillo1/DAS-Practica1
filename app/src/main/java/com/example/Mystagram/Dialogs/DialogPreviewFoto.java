@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -13,6 +13,8 @@ import android.widget.ImageView;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.Mystagram.R;
 
 public class DialogPreviewFoto extends DialogFragment {
     ListenerdelDialogo miListener;

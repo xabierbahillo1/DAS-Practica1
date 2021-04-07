@@ -45,4 +45,5 @@
     <string name="notificacionRegistro">Te has registrado en Mystagram!! Esperamos verte pronto.</string>
     <string name="prefTNumFotos">Número de fotos a visualizar</string>
     <string name="tFotoPorDefecto">Foto Por Defecto</string>
+    <string name="falloBD">Error al conectar con la base de datos</string>
 </resources>

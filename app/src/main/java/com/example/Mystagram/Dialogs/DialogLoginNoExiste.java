@@ -1,4 +1,4 @@
-package com.example.Mystagram;
+package com.example.Mystagram.Dialogs;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -8,6 +8,9 @@ import android.os.Bundle;
 
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
+
+import com.example.Mystagram.R;
+import com.example.Mystagram.RegisterActivity;
 
 public class DialogLoginNoExiste extends DialogFragment {
     public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {

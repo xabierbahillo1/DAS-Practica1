@@ -2,29 +2,40 @@ package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.example.Mystagram.Dialogs.DialogFalloLogin;
+import com.example.Mystagram.Dialogs.DialogLoginNoExiste;
+
+import com.example.Mystagram.WS.inicioSesionWS;
+
 import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity {
-    @Override
+
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         //Gestiono el idioma
         gestionarIdioma();
+        //Definicion de evento para obtener resultado de WS inicio sesion
+
         //Definicion de eventos
         TextView textRegister= findViewById(R.id.registerText);
         textRegister.setOnClickListener(new View.OnClickListener() {
@@ -51,35 +62,8 @@ public class MainActivity extends AppCompatActivity {
                     dialogoFaltanCampos.show(getSupportFragmentManager(), "faltanCampos");
                 }
                 else{ //Procedimiento login
-                    //Compruebo si existe el usuario
-                    miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
-                    SQLiteDatabase bd = GestorDB.getWritableDatabase();
-                    Cursor c = bd.rawQuery("SELECT Usuario FROM Usuarios WHERE Usuario=\'"+usuario+"\'", null);
-                    if (c.moveToFirst()){ //Si cursor no esta vacio, existe el usuario, compruebo si la clave es correcta
-                        Cursor c1 = bd.rawQuery("SELECT Usuario FROM Usuarios WHERE Usuario=\'"+usuario+"\' AND Clave=\'"+password+"\'", null);
-                        if (c1.moveToFirst()){ //Clave correcta
-                            login=true;
-                        }
-                        else{
-                            DialogFragment dialogoClaveIncorrecta= DialogFalloLogin.newInstance(getString(R.string.lgClaveIncorrecta));
-                            dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
-                        }
-                        c.close();
-                        c1.close();
-                    }
-                    else { //Si no existe, muestro un dialog para ofrecerle ir a registrar el usuario
-                        c.close();
-                        DialogFragment dialogoLoginNoExiste = new DialogLoginNoExiste();
-                        dialogoLoginNoExiste.show(getSupportFragmentManager(), "loginNoExiste");
-                    }
-                    bd.close();
+                    gestionarInicioSesion(usuario,password);
                 } //Fin procedimiento login
-                if (login){ //Si el login ha sido correcto
-                    finish();
-                    Intent i = new Intent(getApplicationContext(), ActivityPrincipal.class);
-                    i.putExtra("usuario",usuario);
-                    startActivity(i);
-                }
             }
         });
     }
@@ -136,5 +120,45 @@ public class MainActivity extends AppCompatActivity {
                 getBaseContext().createConfigurationContext(configuration);
         getBaseContext().getResources().updateConfiguration(configuration, context.getResources().getDisplayMetrics());
         recreate();
+    }
+    private void gestionarInicioSesion(String usuario, String clave){
+        //Gestiono el inicio de sesion buscando el usuario y contraseña contra la base de datos remota
+        Data datos = new Data.Builder()
+                .putString("usuario",usuario)
+                .putString("clave",clave)
+                .build();
+        OneTimeWorkRequest loginOtwr= new OneTimeWorkRequest.Builder(inicioSesionWS.class).setInputData(datos)
+                .build();
+
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(loginOtwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        //Trato la respuesta, teniendo en cuenta que: -1 -> Error de BD; 0 -> Usuario y contraseña correctos, 1: Usuario no existe, 2: Password incorrecta
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String resultado=workInfo.getOutputData().getString("resultado");
+                            if (resultado.equals("-1")){ //Fallo de BD
+                                DialogFragment dialogoFalloBD= DialogFalloLogin.newInstance(getString(R.string.falloBD));
+                                dialogoFalloBD.show(getSupportFragmentManager(), "falloBD");
+                            }
+                            else if (resultado.equals("0")){ //Login correcto
+                                finish();
+                                Intent i = new Intent(getApplicationContext(), ActivityPrincipal.class);
+                                i.putExtra("usuario",usuario);
+                                startActivity(i);
+                            }
+                            else if (resultado.equals("1")){ //Usuario no existe
+                                DialogFragment dialogoLoginNoExiste = new DialogLoginNoExiste();
+                                dialogoLoginNoExiste.show(getSupportFragmentManager(), "loginNoExiste");
+                            }
+                            else if (resultado.equals("2")){ //Contraseña no existe
+                                DialogFragment dialogoClaveIncorrecta= DialogFalloLogin.newInstance(getString(R.string.lgClaveIncorrecta));
+                                dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
+                            }
+
+                        }
+                    }
+                });
+        WorkManager.getInstance(getApplicationContext()).enqueue(loginOtwr);
     }
 }
