@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "1069045034128",
+    "project_id": "mystagram-50780",
+    "storage_bucket": "mystagram-50780.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1069045034128:android:7b248906095ad8814b7c15",
+        "android_client_info": {
+          "package_name": "com.example.Mystagram"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1069045034128-0rtgk905df48n5rbjfrq3adtbqkeu22f.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCwW0GxUB-l95WoUyx8_toW2M2PhVDEq5o"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1069045034128-0rtgk905df48n5rbjfrq3adtbqkeu22f.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
