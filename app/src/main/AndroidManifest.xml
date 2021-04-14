@@ -16,10 +16,14 @@
         <activity android:name="com.example.Mystagram.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter>
+                <action android:name="INICIAR" />
+                <category android:name="android.intent.category.DEFAULT"/>
+            </intent-filter>
         </activity>
+
         <service
             android:name=".WS.FirebaseMessageService"
             android:exported="false">

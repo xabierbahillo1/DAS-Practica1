@@ -20,7 +20,11 @@ public class FirebaseMessageService extends FirebaseMessagingService {
     }
     public void onMessageReceived(RemoteMessage remoteMessage) {
         // Si llega un mensaje mientras esta la app abierta
+        Log.d("MensajesFirebase", "De: " + remoteMessage.getFrom());
+        if (remoteMessage.getData().size() > 0) {
+            Log.d("MensajesFirebase", "Payload mensaje: " + remoteMessage.getData());
 
+        }
         // Si el mensaje es una notificacion
         if (remoteMessage.getNotification() != null) {
             Log.d("MensajesFirebase", "Cuerpo notificacion " + remoteMessage.getNotification().getBody());

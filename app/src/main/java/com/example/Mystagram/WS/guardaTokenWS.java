@@ -1,6 +1,7 @@
 package com.example.Mystagram.WS;
 
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -23,7 +24,7 @@ public class guardaTokenWS extends Worker {
     @NonNull
     @Override
     public Result doWork() {
-        String direccion = "http://10.0.2.2/guardarToken.php";
+        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/guardarToken.php";
         HttpURLConnection urlConnection = null;
         try {
             URL destino = new URL(direccion);
@@ -40,6 +41,13 @@ public class guardaTokenWS extends Worker {
             out.close();
             int statusCode = urlConnection.getResponseCode();
             if (statusCode == 200) {
+                BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
+                BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
+                String line, result = "";
+                while ((line = bufferedReader.readLine()) != null) {
+                    result += line;
+                }
+                Log.d("MensajesFirebase", "Resultado subir token: " + result);
                 return Result.success();
             }
         }

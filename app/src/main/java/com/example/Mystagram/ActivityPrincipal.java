@@ -4,12 +4,16 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.DialogFragment;
 //import androidx.preference.PreferenceManager;
+import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -22,6 +26,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
+import android.os.StrictMode;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
 import android.util.Log;
@@ -32,12 +37,21 @@ import android.widget.Toast;
 import com.example.Mystagram.Dialogs.DialogPreviewFoto;
 import com.example.Mystagram.GestorBD.miBD;
 import com.example.Mystagram.GestorFotos.FotoAdapter;
+import com.example.Mystagram.WS.obtenerImagenWS;
+import com.example.Mystagram.WS.subirImagenWS;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.Locale;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class ActivityPrincipal extends AppCompatActivity implements DialogPreviewFoto.ListenerdelDialogo {
     private String usuario; //Usuario que ha iniciado sesion
@@ -46,6 +60,10 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_principal);
+        if (android.os.Build.VERSION.SDK_INT > 9) { //Permito descargas en primer plano
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+        }
         setSupportActionBar(findViewById(R.id.labarra)); //Incluyo la barra
         //Obtengo el usuario que ha iniciado sesion
         Bundle extras= getIntent().getExtras();
@@ -101,73 +119,103 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
 
     public void tratarListaFotos() {
         //Obtiene las fotos subidas desde la base de datos
-
+        AppCompatActivity myActivity= this; //Guardo la actividad para enviarla al FotoAdapter
         RecyclerView rv = (RecyclerView)findViewById(R.id.listaFotos);
         //Obtengo las listas (usuarios: Lista con el nombre de usuario que ha subido la foto, fotos: Lista con las fotos subidas, codusuario= Usuario que ha subido la foto
         //idFotos Id de referencia a la foto
-        miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
-        SQLiteDatabase bd = GestorDB.getReadableDatabase();
-        Cursor c = bd.rawQuery("SELECT a.NombreCompleto,b.img,a.Usuario,b.fotoid FROM Usuarios a, FotosUsuario b WHERE a.Usuario = b.usuario ORDER BY fotoid DESC", null); //Muestro primero las ultimas fotos subidas
-        String[] usuarios=new String[c.getCount()];
-        Bitmap[] fotos= new Bitmap[c.getCount()];
-        String[] codusuario= new String[c.getCount()];
-        int[] idFotos= new int[c.getCount()];
-        int i=0;
-        if (c.getCount()==0){ //Si es vacio, añado una foto de ejemplo
-            usuarios= new String[1];
-            fotos= new Bitmap[1];
-            codusuario= new String[1];
-            idFotos= new int[1];
-            usuarios[0]=getString(R.string.tFotoPorDefecto);
-            fotos[0]= BitmapFactory.decodeResource(this.getResources(),
-                    R.drawable.imagen1);
-            codusuario[0]="prueba";
-            idFotos[0]=-1;
-        }
-        while (c.moveToNext()){
-            String subido= c.getString(0); //Usuario que ha subido la foto
-            byte[] blob= c.getBlob(1); //Foto
-            String usuario= c.getString(2); //Codigo de usuario que ha subido la foto
-            int idFoto= c.getInt(3); //Id de referencia a la foto
-            //Convierto la foto en un bitmap para despues cargarlo en el ImageView
-            ByteArrayInputStream bais = new ByteArrayInputStream(blob);
-            Bitmap bitmap = BitmapFactory.decodeStream(bais);
-            bitmap = Bitmap.createScaledBitmap(bitmap,bitmap.getWidth()/2,bitmap.getHeight()/2,true); //Reescalado para evitar consumir muchos recursos
-            usuarios[i]=subido;
-            fotos[i]=bitmap;
-            codusuario[i]=usuario;
-            idFotos[i]=idFoto;
-            i++;
-            if (i==10){ //Solo muestro las 10 últimas fotos subidas (para evitar consumir muchos recursos)
-                break;
-            }
-        }
-        //Cargo los datos en el adaptador del recyclerview
-        FotoAdapter eladaptador = new FotoAdapter(this,usuarios,fotos,codusuario,idFotos,usuario);
-        c.close();
-        bd.close();
-        rv.setAdapter(eladaptador);
+        OneTimeWorkRequest obtenerFotosOtwr= new OneTimeWorkRequest.Builder(obtenerImagenWS.class)
+                .build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(obtenerFotosOtwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        //Trato la respuesta
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String resultado=workInfo.getOutputData().getString("resultado");
+                            if (resultado.equals("-1") ){ //Fallo de BD
+                                Log.d("obtenerFotos","Error al obtener imagenes del servidor");
+                            }
+                            else{ //Tengo el JSON con los datos
+
+                                try {
+                                    //Obtengo el JSON con los datos de las imagenes
+                                    JSONParser parser = new JSONParser();
+                                    JSONArray json = (JSONArray) parser.parse(resultado);
+                                    //Inicializo arrays con datos de las imagenes para enviar al recyclerview
+                                    String[] usuarios=new String[json.size()];
+                                    Bitmap[] fotos= new Bitmap[json.size()];
+                                    String[] codusuario= new String[json.size()];
+                                    int[] idFotos= new int[json.size()];
+
+                                    for (int i=0;i<json.size();i++){ //Recorro el json
+                                        JSONObject dataJson= (JSONObject) json.get(i);
+                                        String nombre= (String) dataJson.get("NombreCompleto"); //Usuario que ha subido la foto
+                                        String usuario= (String) dataJson.get("Usuario"); ////Codigo de usuario que ha subido la foto
+                                        String fotoid=  (String)dataJson.get("fotoid"); //Id de referencia a la foto
+                                        String fotoRuta= (String)dataJson.get("imgruta");
+                                        //Descargo la foto del servidor
+                                        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/"+fotoRuta;
+                                        URL destino = null;
+                                        try {
+                                            destino = new URL(direccion);
+                                            HttpURLConnection conn = (HttpURLConnection) destino.openConnection();
+                                            int responseCode = 0;
+                                            responseCode = conn.getResponseCode();
+                                            if (responseCode == HttpsURLConnection.HTTP_OK) {
+                                               Bitmap elBitmap = BitmapFactory.decodeStream(conn.getInputStream()); //Obtengo la imagen
+                                               elBitmap = Bitmap.createScaledBitmap(elBitmap,elBitmap.getWidth()/2,elBitmap.getHeight()/2,true); //Reescalado para evitar consumir muchos recursos
+                                               usuarios[i]=nombre;
+                                               fotos[i]=elBitmap;
+                                               codusuario[i]=usuario;
+                                               idFotos[i]=Integer.parseInt(fotoid); //Siempre es un numero
+                                            }
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                        }
+                                    } //Fin for recorre json
+                                    //Cargo los datos en el adaptador del recyclerview
+                                    FotoAdapter eladaptador = new FotoAdapter(usuarios,fotos,codusuario,idFotos,usuario,myActivity);
+                                    rv.setAdapter(eladaptador);
+                                } catch (ParseException e) {
+                                    Log.d("obtenerFotos","Error al obtener el JSON con los datos de las imagenes");
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(getApplicationContext()).enqueue(obtenerFotosOtwr);
     }
-    public void subirFoto(Bitmap bitmap){
-        //Sube un bitmap a BD
-        /**EXTRAIDO DE STACK OVERFLOW
-        Pregunta: https://es.stackoverflow.com/questions/74332/guardar-imagenes-en-sqlite-android
-         Autor: https://es.stackoverflow.com/users/26822/stefan-nolde
-         **/
-        ByteArrayOutputStream baos = new ByteArrayOutputStream(6000);
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 10 , baos);
-        byte[] blob = baos.toByteArray();
-        miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
-        SQLiteDatabase bd = GestorDB.getWritableDatabase();
-        ContentValues nuevo = new ContentValues();
-        nuevo.put("usuario", usuario);
-        nuevo.put("img",blob);
-        bd.insert("FotosUsuario", null, nuevo);
-        Log.d("subidaFoto","Foto subida correctamente");
-        //Cierro la conexion a BD
-        bd.close();
-        tratarListaFotos(); //Actualizo el recyclerview
-        lanzarNotificacionFotoSubida();//Lanzo una notificacion indicando que se ha subido la foto
+
+    public void subirFoto(Uri imgUri){
+        //Sube una foto al servidor
+        Data datos = new Data.Builder()
+                .putString("usuario",usuario)
+                .putString("uri",imgUri.toString())
+                .build();
+
+        OneTimeWorkRequest subirFotoOtwr= new OneTimeWorkRequest.Builder(subirImagenWS.class).setInputData(datos)
+                .build();
+
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(subirFotoOtwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        //Trato la respuesta, teniendo en cuenta que: -1 -> Error de BD; 0 -> Foto subida
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String resultado=workInfo.getOutputData().getString("resultado");
+                            if (resultado.equals("-1")){ //Fallo de BD
+                                Log.d("subidaFoto","Error al subir la foto");
+                            }
+                            else if (resultado.equals("0")){ //Foto subida
+                                Log.d("subidaFoto","Foto subida correctamente");
+                                tratarListaFotos(); //Actualizo el recyclerview
+                                lanzarNotificacionFotoSubida();//Lanzo una notificacion indicando que se ha subido la foto
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(getApplicationContext()).enqueue(subirFotoOtwr);
     }
 
     protected void onSaveInstanceState(Bundle outState){ //Guardo los datos del usuario que ha iniciado sesion
@@ -246,8 +294,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
     }
 
     private void exportarDatosATxt(){
-        //Exporta los datos de los usuarios de la app a un TXT
-
+        //Exporta los datos de los usuarios de la app a un TXT (BD LOCAL, ya no sirve)
         String texto="CodigoUsuario;CorreoElectronico;NombreCompleto;NumeroFotos"; //Escribo la cabecera del fichero
         //Obtengo los datos de los usuarios
         miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
@@ -285,6 +332,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             }
     }
     private void lanzarNotificacionFotoSubida(){
+        //Lanza la notificacion de foto subida
         NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
         NotificationCompat.Builder elBuilder = new NotificationCompat.Builder(this, "NotFotoSubida");
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) { //Si version >= Android Oreo
@@ -300,4 +348,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         elManager.notify(1, elBuilder.build());
 
     }
+
 }
+
+

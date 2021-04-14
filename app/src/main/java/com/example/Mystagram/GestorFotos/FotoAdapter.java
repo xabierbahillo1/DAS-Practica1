@@ -1,6 +1,8 @@
 package com.example.Mystagram.GestorFotos;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.SharedPreferences;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -11,11 +13,20 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.LifecycleOwner;
+import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Data;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkInfo;
+import androidx.work.WorkManager;
 
 import com.example.Mystagram.R;
 import com.example.Mystagram.GestorBD.miBD;
+import com.example.Mystagram.WS.borrarImagenWS;
+import com.example.Mystagram.WS.subirImagenWS;
 
 public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
 
@@ -25,8 +36,8 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
         private int[] ids; //Id de la imagen para identificarla
         private String miUsuario; //Usuario que ha iniciado
         private Context context; //Contexto (para lanzar toast)
-
-        public FotoAdapter(Context appContext, String[] subido, Bitmap[] fotos,String[] usuarios, int[] idFotos, String elUsuario)
+        private AppCompatActivity laActivity; //Actividad
+        public FotoAdapter(String[] subido, Bitmap[] fotos,String[] usuarios, int[] idFotos, String elUsuario, AppCompatActivity activity)
         {
             //Guardo informacion de las imagenes
             lasimagenes=fotos;
@@ -34,7 +45,8 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
             codigosUsuarios=usuarios;
             ids=idFotos;
             miUsuario=elUsuario;
-            context=appContext; //Guardo el contexto para poder lanzar BD y Toast
+            context=activity.getApplicationContext(); //Guardo el contexto para poder lanzar BD y Toast
+            laActivity=activity; //Guardo la actividad para borrar de BD externa
         }
 
         public FotoHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -62,21 +74,38 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
                     if (miUsuario.equals(subidoPor)){ //Si el usuario que ha iniciado sesion es el mismo que ha subido la foto
                         int idFoto=ids[position]; //Id de referencia a la foto
                         //Borro el elemento en BD
-                        miBD GestorDB = new miBD (context, "MystragramDB", null, 1);
-                        SQLiteDatabase bd = GestorDB.getWritableDatabase();
-                        bd.delete("FotosUsuario","fotoid=?",new String[]{Integer.toString(idFoto)});
-                        bd.close();
-                        //Borro el elemento en el recyclerview
-                        eliminarElementoEn(position);
-                        notifyItemRemoved(position);
-                        notifyItemRangeChanged(position, getItemCount());
-                        //Lanzo un toast informando de la accion
-                        Toast toastBorrado =
-                                Toast.makeText(context,
-                                        context.getString((R.string.pToastBorrarFoto)), Toast.LENGTH_SHORT);
+                        Data datos = new Data.Builder()
+                                .putString("fotoid",String.valueOf(idFoto))
+                                .build();
+                        OneTimeWorkRequest borrarFotoOtwr= new OneTimeWorkRequest.Builder(borrarImagenWS.class).setInputData(datos)
+                                .build();
+                        WorkManager.getInstance(context).getWorkInfoByIdLiveData(borrarFotoOtwr.getId())
+                                .observe(laActivity, new Observer<WorkInfo>() {
+                                    @Override
+                                    public void onChanged(WorkInfo workInfo) {
+                                        if(workInfo != null && workInfo.getState().isFinished()){
+                                            String resultado=workInfo.getOutputData().getString("resultado");
+                                            if (resultado.equals("-1")){ //Fallo de BD
+                                                Log.d("borradaFoto","Error al borrar la foto");
+                                            }
+                                            else if (resultado.equals("0")){ //Borrado correcto
+                                                Log.d("borradaFoto","Foto borrada correctamente");
+                                                //Borro el elemento en el recyclerview
+                                                eliminarElementoEn(position);
+                                                notifyItemRemoved(position);
+                                                notifyItemRangeChanged(position, getItemCount());
+                                                //Lanzo un toast informando de la accion
+                                                Toast toastBorrado =
+                                                        Toast.makeText(context,
+                                                                context.getString((R.string.pToastBorrarFoto)), Toast.LENGTH_SHORT);
 
-                        Log.d("borradoFoto","Foto "+idFoto+ "borrada correctamente");
-                        toastBorrado.show();
+                                                Log.d("borradoFoto","Foto "+idFoto+ " borrada correctamente");
+                                                toastBorrado.show();
+                                            }
+                                        }
+                                    }
+                                });
+                        WorkManager.getInstance(context).enqueue(borrarFotoOtwr);
                     }
                     return false;
                 }

@@ -19,7 +19,7 @@ import com.example.Mystagram.R;
 public class DialogPreviewFoto extends DialogFragment {
     ListenerdelDialogo miListener;
     public interface ListenerdelDialogo {
-        void subirFoto(Bitmap bitmap);
+        void subirFoto(Uri miUri);
     }
 
     private Uri imgUri;
@@ -55,7 +55,8 @@ public class DialogPreviewFoto extends DialogFragment {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
                 ImageView img= (ImageView)view.findViewById(R.id.previewImg);
-                miListener.subirFoto(bitmap);
+                miListener.subirFoto(imgUri);
+
             }
         });
         builder.setNegativeButton(getString(R.string.pCancSubirFoto),new DialogInterface.OnClickListener() {
