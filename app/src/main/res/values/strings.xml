@@ -46,4 +46,5 @@
     <string name="prefTNumFotos">Número de fotos a visualizar</string>
     <string name="tFotoPorDefecto">Foto Por Defecto</string>
     <string name="falloBD">Error al conectar con la base de datos</string>
+    <string name="menuSacarFoto">Sacar Foto</string>
 </resources>

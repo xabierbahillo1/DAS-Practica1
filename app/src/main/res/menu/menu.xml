@@ -7,8 +7,8 @@
         android:title="@string/menuSubirFoto"
         app:showAsAction="always" />
     <item
-        android:id="@+id/exportarDatos"
-        android:title="@string/menuExportarDatos"
+        android:id="@+id/sacarFoto"
+        android:title="@string/menuSacarFoto"
         app:showAsAction="never" />
     <item
         android:id="@+id/preferencias"

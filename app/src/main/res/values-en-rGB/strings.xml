@@ -47,4 +47,5 @@
     <string name="prefTNumFotos">Number of photos to view</string>
     <string name="tFotoPorDefecto">Default Photo</string>
     <string name="falloBD">Failed to connect to database</string>
+    <string name="menuSacarFoto">Take a Picture</string>
 </resources>

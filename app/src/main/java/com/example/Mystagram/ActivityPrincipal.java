@@ -2,6 +2,7 @@ package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
+import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
 //import androidx.preference.PreferenceManager;
 import androidx.lifecycle.Observer;
@@ -45,10 +46,16 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
@@ -56,6 +63,8 @@ import javax.net.ssl.HttpsURLConnection;
 public class ActivityPrincipal extends AppCompatActivity implements DialogPreviewFoto.ListenerdelDialogo {
     private String usuario; //Usuario que ha iniciado sesion
     private String idioma; //Idioma de la aplicacion
+
+    private Uri photoURI; //Uri de la foto sacada por la camara
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -99,8 +108,22 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
                 startActivity(i);
                 break;
             }
-            case R.id.exportarDatos:{ //Ha pulsado Exportar datos
-                exportarDatosATxt(); //Exporta los datos de los usuarios del sistema a un TXT
+            case R.id.sacarFoto:{ //Ha pulsado Sacar Foto
+                Intent i= new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                if (i.resolveActivity(getPackageManager()) != null) { //Evita fallo si no tiene ninguna app para lanzar la camara
+                    File eldirectorio = this.getFilesDir(); //Obtengo el directorio de la aplicacion
+                    String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+                    String nombrefichero = "IMG_" + timeStamp + "_";
+                    File photoFile = new File(eldirectorio, nombrefichero + ".jpg");
+                    // Si el fichero se ha creado correctamente
+                    if (photoFile != null) {
+                        photoURI = FileProvider.getUriForFile(this,
+                                "com.example.android.fileprovider",
+                                photoFile);
+                        i.putExtra(MediaStore.EXTRA_OUTPUT, photoURI);
+                        startActivityForResult(i, 2);
+                    }
+                }
                 break;
             }
         }
@@ -111,8 +134,14 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == 1) { //Si se ha seleccionado correctamente una foto, se pregunta si realmente desea subirla.
             Uri imageUri = data.getData();
-            String uriString=imageUri.toString();
-            DialogFragment dialogoPreviewFoto= DialogPreviewFoto.newInstance(uriString); //Muestro en un dialog la foto a subir
+            String uriString = imageUri.toString();
+            DialogFragment dialogoPreviewFoto = DialogPreviewFoto.newInstance(uriString); //Muestro en un dialog la foto a subir
+            dialogoPreviewFoto.show(getSupportFragmentManager(), "previewFoto");
+        }
+        if (resultCode == RESULT_OK && requestCode == 2){
+            //Si se ha sacado correctamente una foto, se pregunta si realmente desea subirla
+            String uriString = photoURI.toString();
+            DialogFragment dialogoPreviewFoto = DialogPreviewFoto.newInstance(uriString); //Muestro en un dialog la foto a subir
             dialogoPreviewFoto.show(getSupportFragmentManager(), "previewFoto");
         }
     }
@@ -279,22 +308,8 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         recreate();
     }
 
-    public boolean onPrepareOptionsMenu(Menu menu)
-    {
-        MenuItem exportData = menu.findItem(R.id.exportarDatos);
-        if(usuario.equals("admin")) //Si el usuario es el administrador muestro la opcion de exportar datos
-        {
-            exportData.setVisible(true);
-        }
-        else //Si no es administrador, oculto la opcion de exportar datos
-        {
-            exportData.setVisible(false);
-        }
-        return true;
-    }
-
     private void exportarDatosATxt(){
-        //Exporta los datos de los usuarios de la app a un TXT (BD LOCAL, ya no sirve)
+        //Exporta los datos de los usuarios de la app a un TXT (BD LOCAL, ya no sirve, opcion desactivada)
         String texto="CodigoUsuario;CorreoElectronico;NombreCompleto;NumeroFotos"; //Escribo la cabecera del fichero
         //Obtengo los datos de los usuarios
         miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
