@@ -1,10 +1,7 @@
 package com.example.Mystagram.GestorFotos;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.SharedPreferences;
-import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +11,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.lifecycle.LifecycleOwner;
+import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -23,10 +20,10 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import com.example.Mystagram.Dialogs.DialogAnadirContacto;
 import com.example.Mystagram.R;
-import com.example.Mystagram.GestorBD.miBD;
 import com.example.Mystagram.WS.borrarImagenWS;
-import com.example.Mystagram.WS.subirImagenWS;
+import com.example.Mystagram.WS.obtenerTelefonoWS;
 
 public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
 
@@ -66,6 +63,41 @@ public class FotoAdapter extends RecyclerView.Adapter<FotoHolder>{
                 texto+=" ("+codigosUsuarios[position]+")";
             }
             holder.elTexto.setText(texto);
+            holder.itemView.setOnClickListener(new View.OnClickListener(){
+                public void onClick(View v){
+                    String subidoPor=codigosUsuarios[position];
+
+                    if (!miUsuario.equals(subidoPor)){ //Si el usuario de la foto no eres tu, se ofrece añadirlo a contactos
+                        //Obtengo el nombre y telefono del contacto
+                        String nombreSubido=lassubido[position];
+                        Data datos = new Data.Builder()
+                                .putString("usuario",String.valueOf(subidoPor))
+                                .build();
+                        OneTimeWorkRequest obtenerTelefonoOtwr= new OneTimeWorkRequest.Builder(obtenerTelefonoWS.class).setInputData(datos)
+                                .build();
+                        WorkManager.getInstance(context).getWorkInfoByIdLiveData(obtenerTelefonoOtwr.getId())
+                                .observe(laActivity, new Observer<WorkInfo>() {
+                                    @Override
+                                    public void onChanged(WorkInfo workInfo) {
+                                        if(workInfo != null && workInfo.getState().isFinished()){
+                                            String resultado=workInfo.getOutputData().getString("resultado");
+                                            if (resultado.equals("-1")){ //Fallo de BD
+                                                Log.d("obtenerTelefono","Error obtener el telefono");
+                                            }
+                                            else if (resultado.length()==9){ //Es telefono
+                                                String telefono=resultado;
+                                                //Creo un dialog para informar si desea agregar al usuario
+                                                DialogFragment dialogoAnadirContacto = DialogAnadirContacto.newInstance(nombreSubido,telefono); //Muestro en un dialog la foto a subir
+                                                dialogoAnadirContacto.show(laActivity.getSupportFragmentManager(), "anadirContacto");
+                                            }
+                                        }
+                                    }
+                                });
+                        WorkManager.getInstance(context).enqueue(obtenerTelefonoOtwr);
+                    }
+
+                }
+            });
             //Defino accion de pulsación larga (borrar la imagen si el usuario que pulsa de forma larga es el que subio la foto)
             holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override

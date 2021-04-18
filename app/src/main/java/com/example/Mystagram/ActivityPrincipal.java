@@ -4,7 +4,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
-//import androidx.preference.PreferenceManager;
 import androidx.lifecycle.Observer;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -13,11 +12,14 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import android.Manifest;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -29,6 +31,7 @@ import android.os.Bundle;
 import android.os.LocaleList;
 import android.os.StrictMode;
 import android.preference.PreferenceManager;
+import android.provider.ContactsContract;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Menu;
@@ -36,6 +39,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.example.Mystagram.Dialogs.DialogPreviewFoto;
+import com.example.Mystagram.Dialogs.DialogAnadirContacto;
 import com.example.Mystagram.GestorBD.miBD;
 import com.example.Mystagram.GestorFotos.FotoAdapter;
 import com.example.Mystagram.WS.obtenerImagenWS;
@@ -47,24 +51,25 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
-import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class ActivityPrincipal extends AppCompatActivity implements DialogPreviewFoto.ListenerdelDialogo {
+public class ActivityPrincipal extends AppCompatActivity implements DialogPreviewFoto.ListenerdelDialogo, DialogAnadirContacto.ListenerdelDialogo{
     private String usuario; //Usuario que ha iniciado sesion
     private String idioma; //Idioma de la aplicacion
 
     private Uri photoURI; //Uri de la foto sacada por la camara
+
+    private String contactUser; //Usuario a añadir a contactos
+    private String telUser; //Telefono a añadir a contactos
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -364,6 +369,54 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
 
     }
 
+    @Override
+    public void anadirAContactos(String usuario, String telefono) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && this.checkSelfPermission(Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
+            //Añado los parametros para volver a hacer la llamada despues de pedir permisos
+            contactUser=usuario;
+            telUser=telefono;
+            requestPermissions(new String[]{Manifest.permission.WRITE_CONTACTS}, 100); //Pido los permisos de escribir
+        } else {
+            // Ya tiene el permiso o es <=Android 6, añado a contactos
+
+            //La forma recomendada por Android para añadir un contacto es mediante un proceso de lotes:
+            ArrayList<ContentProviderOperation> ops = new ArrayList<ContentProviderOperation>();
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.RawContacts.CONTENT_URI)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_TYPE, null)
+                    .withValue(ContactsContract.RawContacts.ACCOUNT_NAME,null)
+                    .build());
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                            .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                            .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.StructuredName.CONTENT_ITEM_TYPE)
+                            .withValue(ContactsContract.CommonDataKinds.StructuredName.DISPLAY_NAME, usuario)
+                            .build());
+            ops.add(ContentProviderOperation.newInsert(ContactsContract.Data.CONTENT_URI)
+                            .withValueBackReference(ContactsContract.Data.RAW_CONTACT_ID, 0)
+                             .withValue(ContactsContract.Data.MIMETYPE, ContactsContract.CommonDataKinds.Phone.CONTENT_ITEM_TYPE)
+                            .withValue(ContactsContract.CommonDataKinds.Phone.NUMBER, telefono)
+                            .withValue(ContactsContract.CommonDataKinds.Phone.TYPE, ContactsContract.CommonDataKinds.Phone.TYPE_MOBILE)
+                             .build());
+            try {
+                getContentResolver().applyBatch(ContactsContract.AUTHORITY, ops);
+                Toast.makeText(getApplicationContext(), getString(R.string.anadirContactoOK), Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(getApplicationContext(), getString(R.string.anadirContactoFallo), Toast.LENGTH_SHORT).show();
+                Log.e("Creacionusuario", "Error al crear un usuario: " + e);
+            }
+        }
+    }
+
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        //Gestion de permisos
+        if (requestCode == 100) { //Recojo la respuesta del permiso de escritura en contactos
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { //Si se ha dado permiso
+                anadirAContactos(contactUser,telUser);
+            } else { //No se ha dado permiso, muestro un toast indicando que no se ha podido añadir el usuario
+                Toast.makeText(this, getString(R.string.anadirContactoFallo), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
 
 

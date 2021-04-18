@@ -1,5 +1,7 @@
 package com.example.Mystagram.WS;
+
 import android.content.Context;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
@@ -13,15 +15,16 @@ import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class registroWS extends Worker {
-    public registroWS(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+public class obtenerTelefonoWS extends Worker {
+
+    public obtenerTelefonoWS(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
 
     @NonNull
     @Override
     public Result doWork() {
-        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/registrarUsuario.php";
+        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/obtenerTelefonos.php";
         HttpURLConnection urlConnection = null;
         try {
             URL destino = new URL(direccion);
@@ -32,23 +35,19 @@ public class registroWS extends Worker {
             urlConnection.setDoOutput(true);
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
             PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
-            //Paso los datos del usuario a registrar como parametro
             String usuario= getInputData().getString("usuario");
-            String telefono= getInputData().getString("telefono");
-            String nombrecompleto= getInputData().getString("nombrecompleto");
-            String clave= getInputData().getString("clave");
-            String parametros = "usuario="+usuario+"&telefono="+telefono+"&nombrecompleto="+nombrecompleto+"&clave="+clave;
+            String parametros = "usuario="+usuario;
             out.print(parametros);
             out.close();
             int statusCode = urlConnection.getResponseCode();
-            if (statusCode == 200) { //Si 200 OK, recojo la respuesta del servidor
+            if (statusCode == 200) {
                 BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 String line, result = "";
                 while ((line = bufferedReader.readLine()) != null) {
                     result += line;
                 }
-                inputStream.close();
+                Log.d("ObtenerTelefono", "Resultado obtener telefono: " + result);
                 Data resultados = new Data.Builder()
                         .putString("resultado",result)
                         .build();
@@ -60,5 +59,4 @@ public class registroWS extends Worker {
         }
         return null;
     }
-
 }

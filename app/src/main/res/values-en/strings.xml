@@ -48,4 +48,12 @@
     <string name="tFotoPorDefecto">Default Photo</string>
     <string name="falloBD">Failed to connect to database</string>
     <string name="menuSacarFoto">Take a Picture</string>
+    <string name="rgTelefonoText">Phone number</string>
+    <string name="rgTelefonoIncorrecto">The phone number entered is not valid</string>
+    <string name="anadirContactoTitle">Add to contacts</string>
+    <string name="anadirContactoText1">Do you want to add</string>
+    <string name="anadirContactoText2">user to your contacts?</string>
+    <string name="anadirContactoOption1">ADD</string>
+    <string name="anadirContactoFallo">The user could not be added to contacts</string>
+    <string name="anadirContactoOK">It has been successfully added to your contacts !!</string>
 </resources>

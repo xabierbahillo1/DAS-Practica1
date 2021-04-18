@@ -46,13 +46,13 @@
         app:layout_constraintVertical_bias="0.0" />
 
     <EditText
-        android:id="@+id/rgEmailText"
+        android:id="@+id/rgTelefonoText"
         android:layout_width="251dp"
         android:layout_height="50dp"
         android:layout_marginTop="4dp"
         android:ems="10"
-        android:hint="@string/rgEmail"
-        android:inputType="textPersonName"
+        android:hint="@string/rgTelefonoText"
+        android:inputType="number|textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
@@ -69,7 +69,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.5"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/rgEmailText" />
+        app:layout_constraintTop_toBottomOf="@+id/rgTelefonoText" />
 
     <EditText
         android:id="@+id/rgUsuarioText"

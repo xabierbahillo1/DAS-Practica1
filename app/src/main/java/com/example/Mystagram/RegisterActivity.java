@@ -41,24 +41,24 @@ public class RegisterActivity extends AppCompatActivity {
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                EditText correoET=findViewById(R.id.rgEmailText);
+                EditText telefonoET=findViewById(R.id.rgTelefonoText);
                 EditText nomComET=findViewById(R.id.rgNomComText);
                 EditText usuarioET=findViewById(R.id.rgUsuarioText);
                 EditText passwordET=findViewById(R.id.rgPasswordText);
-                String correo=correoET.getText().toString();
+                String telefono=telefonoET.getText().toString();
                 String nomCom=nomComET.getText().toString();
                 String usuario=usuarioET.getText().toString();
                 String password=passwordET.getText().toString();
                 boolean registrado=false;
-                if (correo.equals("") || nomCom.equals("") || usuario.equals("") || password.equals("")){ //Si alguno de los campos esta vacio
+                if (telefono.equals("") || nomCom.equals("") || usuario.equals("") || password.equals("")){ //Si alguno de los campos esta vacio
                     //Devuelvo dialog indicandolo
                     DialogFragment dialogoFaltanCampos= DialogFalloRegistro.newInstance(getString(R.string.rgFaltanCampos));
                     dialogoFaltanCampos.show(getSupportFragmentManager(), "faltanCampos");
                 }
                 else{ //Comienza proceso registrar
-                    if (!comprobarCorreo(correo)){ //Comprueba la estructura del correo
-                        DialogFragment dialogoCorreoIncorrecto= DialogFalloRegistro.newInstance(getString(R.string.rgCorreoIncorrecto));
-                        dialogoCorreoIncorrecto.show(getSupportFragmentManager(), "correoIncorrecto");
+                    if (telefono.length()!=9){ //Si no tiene nueve digitos no es un telefono correcto
+                        DialogFragment dialogoTelefonoIncorrecto= DialogFalloRegistro.newInstance(getString(R.string.rgTelefonoIncorrecto));
+                        dialogoTelefonoIncorrecto.show(getSupportFragmentManager(), "telefonoIncorrecto");
                     }
                     else {
                         if (password.length()<4){ //Clave demasiado corta
@@ -66,7 +66,7 @@ public class RegisterActivity extends AppCompatActivity {
                             dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
                         }
                         else{
-                            gestionarInicioSesion(usuario,correo,nomCom,password);
+                            gestionarInicioSesion(usuario,telefono,nomCom,password);
                         }
                     }
                 } //fin proceso registrar
@@ -124,11 +124,11 @@ public class RegisterActivity extends AppCompatActivity {
         recreate();
     }
 
-    private void gestionarInicioSesion(String usuario, String correo, String nombrecompleto, String clave) {
+    private void gestionarInicioSesion(String usuario, String telefono, String nombrecompleto, String clave) {
         //Gestiono el registro del usuario en la base de datos externa
         Data datos = new Data.Builder()
                 .putString("usuario",usuario)
-                .putString("correo",correo)
+                .putString("telefono",telefono)
                 .putString("nombrecompleto",nombrecompleto)
                 .putString("clave",clave)
                 .build();

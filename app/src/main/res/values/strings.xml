@@ -47,4 +47,12 @@
     <string name="tFotoPorDefecto">Foto Por Defecto</string>
     <string name="falloBD">Error al conectar con la base de datos</string>
     <string name="menuSacarFoto">Sacar Foto</string>
+    <string name="rgTelefonoText">Número de telefono</string>
+    <string name="rgTelefonoIncorrecto">El número de telefono introducido no es válido</string>
+    <string name="anadirContactoTitle">Añadir a contactos</string>
+    <string name="anadirContactoText1">¿Desea añadir el usuario</string>
+    <string name="anadirContactoText2">a tus contectos?</string>
+    <string name="anadirContactoOption1">AÑADIR</string>
+    <string name="anadirContactoFallo">No se ha podido añadir el usuario a contactos</string>
+    <string name="anadirContactoOK">Se ha añadido correctamente a tus contactos!!</string>
 </resources>
