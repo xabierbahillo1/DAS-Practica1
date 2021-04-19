@@ -55,4 +55,6 @@
     <string name="anadirContactoOption1">AÑADIR</string>
     <string name="anadirContactoFallo">No se ha podido añadir el usuario a contactos</string>
     <string name="anadirContactoOK">Se ha añadido correctamente a tus contactos!!</string>
+    <string name="appwidget_text">EXAMPLE</string>
+    <string name="add_widget">Add widget</string>
 </resources>
