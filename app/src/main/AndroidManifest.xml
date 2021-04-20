@@ -25,7 +25,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/my_widget_info" />
         </receiver>
-        <receiver android:name=".Alarmas.AlarmManagerBroadcastRecevier"/>
+        <receiver android:name=".Alarmas.AlarmManagerBroadcastReceiver"/>
+        <receiver android:name=".Alarmas.AlarmLanzaNotificacion"/>
         <activity android:name=".PreferencesActivity" />
         <activity android:name=".ActivityPrincipal" />
         <activity android:name=".RegisterActivity" />

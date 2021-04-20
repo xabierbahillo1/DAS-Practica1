@@ -56,4 +56,12 @@
     <string name="anadirContactoOption1">ADD</string>
     <string name="anadirContactoFallo">The user could not be added to contacts</string>
     <string name="anadirContactoOK">It has been successfully added to your contacts !!</string>
+    <string name="lanzarNotiTxt">Launch Message</string>
+    <string name="programarNotiTxt">Schedule Message</string>
+    <string name="lanzadaNoti">A message has been sent to the devices</string>
+    <string name="programaNoti">A message has been scheduled for one minute</string>
+    <string name="programaDialogText">You are going to schedule a message launch via Firebase in a minute</string>
+    <string name="programRep">REPEAT</string>
+    <string name="programUn">ONLY ONCE</string>
+    <string name="programaNotiRep">"46 / 5000 Resultados de traducción A message has been scheduled to be launched every minute "</string>
 </resources>

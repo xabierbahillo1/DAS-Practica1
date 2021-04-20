@@ -14,6 +14,14 @@
         android:id="@+id/preferencias"
         android:title="@string/menuPreferencias"
         app:showAsAction="never" />
+    <item
+        android:id="@+id/lanzarNotificacion"
+        android:title="@string/lanzarNotiTxt"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/programarNotificacion"
+        android:title="@string/programarNotiTxt"
+        app:showAsAction="never" />
 
 
 </menu>

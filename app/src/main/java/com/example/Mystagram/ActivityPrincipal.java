@@ -13,8 +13,10 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.Manifest;
+import android.app.AlarmManager;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
@@ -30,6 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.os.StrictMode;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -38,10 +41,14 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.example.Mystagram.Alarmas.AlarmLanzaNotificacion;
+import com.example.Mystagram.Alarmas.AlarmManagerBroadcastReceiver;
 import com.example.Mystagram.Dialogs.DialogPreviewFoto;
 import com.example.Mystagram.Dialogs.DialogAnadirContacto;
+import com.example.Mystagram.Dialogs.DialogProgramarMensaje;
 import com.example.Mystagram.GestorBD.miBD;
 import com.example.Mystagram.GestorFotos.FotoAdapter;
+import com.example.Mystagram.WS.firebaseMensajeWS;
 import com.example.Mystagram.WS.obtenerImagenWS;
 import com.example.Mystagram.WS.subirImagenWS;
 
@@ -57,6 +64,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
 
@@ -131,9 +139,37 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
                 }
                 break;
             }
+            case R.id.lanzarNotificacion:{ //Ha pulsado preferencias, Abre el activity para modificar las preferencias
+                lanzarNotificacion();
+                break;
+            }
+            case R.id.programarNotificacion:{
+                DialogFragment dialogoPrograma= DialogProgramarMensaje.newInstance(); //Muestro en un dialog las opciones de programacion de mensaje
+                dialogoPrograma.show(getSupportFragmentManager(), "programaMensaje");
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
+
+    public boolean onPrepareOptionsMenu(Menu menu)
+    {
+        MenuItem lanzarNot = menu.findItem(R.id.lanzarNotificacion);
+        MenuItem programNot = menu.findItem(R.id.programarNotificacion);
+        if(usuario.equals("admin")) //Si el usuario es el administrador muestro la opcion de lanzar y programar notificacion
+        {
+            lanzarNot.setVisible(true);
+            programNot.setVisible(true);
+        }
+        else //Si no es administrador, oculto la opcion de lanzar y programar notificacion
+        {
+            lanzarNot.setVisible(false);
+            programNot.setVisible(false);
+        }
+        return true;
+    }
+
+
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         //Ha finalizado un ActivityForResult, recupero la informacion
         super.onActivityResult(requestCode, resultCode, data);
@@ -417,6 +453,14 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             }
         }
     }
+
+    public void lanzarNotificacion(){
+        OneTimeWorkRequest lanzarNotiOtwr= new OneTimeWorkRequest.Builder(firebaseMensajeWS.class)
+                .build();
+        WorkManager.getInstance(getApplicationContext()).enqueue(lanzarNotiOtwr);
+        Toast.makeText(getApplicationContext(), getString(R.string.lanzadaNoti), Toast.LENGTH_SHORT).show();
+    }
+
 }
 
 

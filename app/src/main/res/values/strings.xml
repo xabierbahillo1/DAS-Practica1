@@ -57,4 +57,12 @@
     <string name="anadirContactoOK">Se ha añadido correctamente a tus contactos!!</string>
     <string name="appwidget_text">EXAMPLE</string>
     <string name="add_widget">Add widget</string>
+    <string name="lanzarNotiTxt">Lanzar Mensaje</string>
+    <string name="programarNotiTxt">Programar Mensaje</string>
+    <string name="lanzadaNoti">Se ha enviado un mensaje a los dispositivos</string>
+    <string name="programaNoti">Se ha programado un mensaje para dentro de un minuto</string>
+    <string name="programaDialogText">Vas a programar el lanzamiento de un mensaje mediante Firebase en un minuto</string>
+    <string name="programRep">REPETIR</string>
+    <string name="programUn">SOLO UNA VEZ</string>
+    <string name="programaNotiRep">Se ha programado lanzar un mensaje cada minuto</string>
 </resources>

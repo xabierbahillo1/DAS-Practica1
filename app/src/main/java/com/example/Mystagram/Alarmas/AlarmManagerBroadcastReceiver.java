@@ -9,6 +9,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.StrictMode;
+import android.util.Log;
 import android.widget.RemoteViews;
 
 import com.android.volley.Request;
@@ -35,7 +36,8 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.my_widget);
-
+        Log.d("AlarmWidget","Se ejecuta actualizacion del widget");
+        System.out.println("Se ejecuta actualizacion del widget");
         RequestQueue queue = Volley.newRequestQueue(context);
         if (android.os.Build.VERSION.SDK_INT > 9) //Permito descargas en primer plano
         {
