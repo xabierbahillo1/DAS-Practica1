@@ -42,6 +42,8 @@
             android:id="@+id/imagenWidget"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:adjustViewBounds="false"
+            android:scaleType="centerCrop"
             tools:srcCompat="@drawable/imagen1" />
 
     </LinearLayout>

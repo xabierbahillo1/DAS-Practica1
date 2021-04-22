@@ -37,7 +37,9 @@ public class registroWS extends Worker {
             String telefono= getInputData().getString("telefono");
             String nombrecompleto= getInputData().getString("nombrecompleto");
             String clave= getInputData().getString("clave");
-            String parametros = "usuario="+usuario+"&telefono="+telefono+"&nombrecompleto="+nombrecompleto+"&clave="+clave;
+            String latitud=getInputData().getString("latitud");
+            String longitud=getInputData().getString("longitud");
+            String parametros = "usuario="+usuario+"&telefono="+telefono+"&nombrecompleto="+nombrecompleto+"&clave="+clave+"&latitud="+latitud+"&longitud="+longitud;
             out.print(parametros);
             out.close();
             int statusCode = urlConnection.getResponseCode();

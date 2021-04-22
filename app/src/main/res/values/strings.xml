@@ -65,4 +65,5 @@
     <string name="programRep">REPETIR</string>
     <string name="programUn">SOLO UNA VEZ</string>
     <string name="programaNotiRep">Se ha programado lanzar un mensaje cada minuto</string>
+    <string name="rgNoUbicacion">No se guardará tu ubicación al registrarte</string>
 </resources>

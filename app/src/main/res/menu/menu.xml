@@ -22,6 +22,9 @@
         android:id="@+id/programarNotificacion"
         android:title="@string/programarNotiTxt"
         app:showAsAction="never" />
-
+    <item
+        android:id="@+id/mapas"
+        android:title="Mapas"
+        app:showAsAction="never" />
 
 </menu>

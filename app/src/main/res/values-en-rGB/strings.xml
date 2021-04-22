@@ -63,5 +63,6 @@
     <string name="programaDialogText">"You are going to schedule a message launch via Firebase in a minute "</string>
     <string name="programRep">REPEAT</string>
     <string name="programUn">ONLY ONCE</string>
-    <string name="programaNotiRep">"46 / 5000 Resultados de traducción A message has been scheduled to be launched every minute "</string>
+    <string name="programaNotiRep">"A message has been scheduled to be launched every minute "</string>
+    <string name="rgNoUbicacion">Your location will not be saved when you register</string>
 </resources>

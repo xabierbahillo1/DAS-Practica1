@@ -1,6 +1,8 @@
 package com.example.Mystagram;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -9,34 +11,44 @@ import androidx.work.OneTimeWorkRequest;
 import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
+import android.Manifest;
 import android.content.Context;
 
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.content.res.Configuration;
 
+import android.location.Location;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
 
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.example.Mystagram.Dialogs.DialogFalloRegistro;
 import com.example.Mystagram.Dialogs.DialogFinRegistro;
 
 import com.example.Mystagram.WS.registroWS;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class RegisterActivity extends AppCompatActivity {
-
+    private String latitud;
+    private String longitud;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        obtenerGeolocalizacion(); //Obtengo la ubicacion
         Button buttonRegister= findViewById(R.id.buttonRegister);
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -66,7 +78,7 @@ public class RegisterActivity extends AppCompatActivity {
                             dialogoClaveIncorrecta.show(getSupportFragmentManager(), "claveIncorrecta");
                         }
                         else{
-                            gestionarInicioSesion(usuario,telefono,nomCom,password);
+                            gestionarRegistro(usuario,telefono,nomCom,password);
                         }
                     }
                 } //fin proceso registrar
@@ -124,13 +136,15 @@ public class RegisterActivity extends AppCompatActivity {
         recreate();
     }
 
-    private void gestionarInicioSesion(String usuario, String telefono, String nombrecompleto, String clave) {
+    private void gestionarRegistro(String usuario, String telefono, String nombrecompleto, String clave) {
         //Gestiono el registro del usuario en la base de datos externa
         Data datos = new Data.Builder()
                 .putString("usuario",usuario)
                 .putString("telefono",telefono)
                 .putString("nombrecompleto",nombrecompleto)
                 .putString("clave",clave)
+                .putString("latitud",latitud)
+                .putString("longitud",longitud)
                 .build();
 
         OneTimeWorkRequest registerOtwr= new OneTimeWorkRequest.Builder(registroWS.class).setInputData(datos)
@@ -160,5 +174,45 @@ public class RegisterActivity extends AppCompatActivity {
                     }
                 });
         WorkManager.getInstance(getApplicationContext()).enqueue(registerOtwr);
+    }
+
+    private void obtenerGeolocalizacion(){
+        longitud="Desconocida";
+        latitud="Desconocida";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && this.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 100); //Pido los permisos de acceder a la ubicacion
+        } else {
+            //Ya tiene permisos o android<=6
+
+            FusedLocationProviderClient proveedordelocalizacion =
+                    LocationServices.getFusedLocationProviderClient(this);
+            proveedordelocalizacion.getLastLocation()
+                    .addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                        @Override
+                        public void onSuccess(Location location) {
+                            if (location != null) {
+                                latitud = String.valueOf(location.getLatitude());
+                                longitud = String.valueOf(location.getLongitude());
+                            }
+                        }
+                    })
+                    .addOnFailureListener(this, new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            System.out.println("No puede conseguir la localizacion");
+                        }
+                    });
+        }
+    }
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        //Gestion de permisos
+        if (requestCode == 100) { //Recojo la respuesta del permiso de geolocalizacion
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { //Si se ha dado permiso
+                obtenerGeolocalizacion();
+            } else { //No se ha dado permiso, muestro un toast indicando que no se guardará la geolocalizacion
+                Toast.makeText(this, getString(R.string.rgNoUbicacion), Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

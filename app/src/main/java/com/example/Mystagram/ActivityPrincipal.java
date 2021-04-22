@@ -1,6 +1,7 @@
 package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
@@ -146,6 +147,11 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             case R.id.programarNotificacion:{
                 DialogFragment dialogoPrograma= DialogProgramarMensaje.newInstance(); //Muestro en un dialog las opciones de programacion de mensaje
                 dialogoPrograma.show(getSupportFragmentManager(), "programaMensaje");
+                break;
+            }
+            case R.id.mapas:{ //Ha pulsado preferencias, Abre el activity para modificar las preferencias
+                Intent i = new Intent(getApplicationContext(), ActividadMapa.class);
+                startActivity(i);
                 break;
             }
         }

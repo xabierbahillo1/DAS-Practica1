@@ -104,7 +104,7 @@ public class MyWidget extends AppWidgetProvider {
                                 responseCode = conn.getResponseCode();
                                 if (responseCode == HttpsURLConnection.HTTP_OK) {
                                     Bitmap elBitmap = BitmapFactory.decodeStream(conn.getInputStream()); //Obtengo la imagen
-                                    elBitmap = Bitmap.createScaledBitmap(elBitmap, 1920/2, 1600/2, true); //Reescalado para evitar consumir muchos recursos o pasar tamaño maximo widget
+                                    elBitmap = Bitmap.createScaledBitmap(elBitmap,elBitmap.getWidth()/4,elBitmap.getHeight()/4,true); //Reescalado para evitar consumir muchos recursos
                                     views.setTextViewText(R.id.textSubido, usuario);
                                     views.setImageViewBitmap(R.id.imagenWidget, elBitmap);
                                     appWidgetManager.updateAppWidget(appWidgetId, views);
