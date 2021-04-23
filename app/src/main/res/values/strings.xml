@@ -66,4 +66,8 @@
     <string name="programUn">SOLO UNA VEZ</string>
     <string name="programaNotiRep">Se ha programado lanzar un mensaje cada minuto</string>
     <string name="rgNoUbicacion">No se guardará tu ubicación al registrarte</string>
+    <string name="locAlertTitle">Error al obtener localizaciones</string>
+    <string name="locAlertErrorBD">No se ha podido conectar con la base de datos</string>
+    <string name="locAlertErrorNoLoc">Ningún usuario ha compartido su geolocalización al registrarse</string>
+    <string name="locTitle">Localizar Usuarios</string>
 </resources>

@@ -2,7 +2,7 @@ package com.example.Mystagram;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
 import androidx.preference.PreferenceManager;
@@ -38,8 +38,7 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 
 import java.util.Locale;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
 
 public class RegisterActivity extends AppCompatActivity {
     private String latitud;
@@ -84,20 +83,6 @@ public class RegisterActivity extends AppCompatActivity {
                 } //fin proceso registrar
             }
         });
-    }
-
-    private boolean comprobarCorreo(String elCorreo){
-        //Compruebo que el correo electronico sea correcto
-        Pattern pattern = Pattern
-                .compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@"
-                        + "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
-        Matcher mather = pattern.matcher(elCorreo);
-        if (mather.find()==true){ //El correo es correcto
-           return true;
-        }
-        else{
-            return false;
-        }
     }
     protected void onRestoreInstanceState(Bundle savedInstanceState){ //Si roto la pantalla
         super.onRestoreInstanceState(savedInstanceState);

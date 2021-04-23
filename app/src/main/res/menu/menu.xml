@@ -15,6 +15,10 @@
         android:title="@string/menuPreferencias"
         app:showAsAction="never" />
     <item
+        android:id="@+id/mapas"
+        android:title="@string/locTitle"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/lanzarNotificacion"
         android:title="@string/lanzarNotiTxt"
         app:showAsAction="never" />
@@ -22,9 +26,6 @@
         android:id="@+id/programarNotificacion"
         android:title="@string/programarNotiTxt"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/mapas"
-        android:title="Mapas"
-        app:showAsAction="never" />
+
 
 </menu>

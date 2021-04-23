@@ -7,10 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 

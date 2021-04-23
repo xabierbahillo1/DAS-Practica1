@@ -65,4 +65,8 @@
     <string name="programUn">ONLY ONCE</string>
     <string name="programaNotiRep">"A message has been scheduled to be launched every minute "</string>
     <string name="rgNoUbicacion">Your location will not be saved when you register</string>
+    <string name="locAlertTitle">Failed to get locations</string>
+    <string name="locAlertErrorNoLoc">No user has shared their geolocation when registering</string>
+    <string name="locAlertErrorBD">Could not connect to the database</string>
+    <string name="locTitle">Locate Users</string>
 </resources>

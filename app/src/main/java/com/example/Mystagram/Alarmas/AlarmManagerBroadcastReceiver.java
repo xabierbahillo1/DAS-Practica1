@@ -27,8 +27,7 @@ import org.json.simple.parser.JSONParser;
 
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -36,8 +35,7 @@ public class AlarmManagerBroadcastReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         RemoteViews views = new RemoteViews(context.getPackageName(), R.layout.my_widget);
-        Log.d("AlarmWidget","Se ejecuta actualizacion del widget");
-        System.out.println("Se ejecuta actualizacion del widget");
+        Log.d("alarmaWidget","Se ejecuta actualizacion del widget en: "+System.currentTimeMillis());
         RequestQueue queue = Volley.newRequestQueue(context);
         if (android.os.Build.VERSION.SDK_INT > 9) //Permito descargas en primer plano
         {

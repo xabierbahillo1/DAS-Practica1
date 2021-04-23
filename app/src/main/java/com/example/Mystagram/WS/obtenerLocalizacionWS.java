@@ -1,29 +1,27 @@
 package com.example.Mystagram.WS;
-import android.content.Context;
 
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.work.Data;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
-
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-public class borrarImagenWS extends Worker {
-    public borrarImagenWS(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+public class obtenerLocalizacionWS extends Worker {
+    public obtenerLocalizacionWS(@NonNull Context context, @NonNull WorkerParameters workerParams) {
         super(context, workerParams);
     }
+
     @NonNull
     @Override
     public Result doWork() {
-        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/obtenerImagenes.php";
+        String direccion = "http://ec2-54-167-31-169.compute-1.amazonaws.com/xbahillo001/WEB/obtenerLocalizaciones.php";
         HttpURLConnection urlConnection = null;
         try {
             URL destino = new URL(direccion);
@@ -33,13 +31,8 @@ public class borrarImagenWS extends Worker {
             urlConnection.setRequestMethod("POST");
             urlConnection.setDoOutput(true);
             urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
-            PrintWriter out = new PrintWriter(urlConnection.getOutputStream());
-            String fotoid= getInputData().getString("fotoid");
-            String parametros = "fotoid="+fotoid+"&tokenDelete=lU&ff*l282I!"; //Token para evitar que borren una foto de BD facilmente
-            out.print(parametros);
-            out.close();
             int statusCode = urlConnection.getResponseCode();
-            if (statusCode == 200) { //Si 200 OK, recojo la respuesta del servidor
+            if (statusCode == 200) { //Si 200 OK, recojo la respuesta del servidor (JSON con los datos de las imagenes)
                 BufferedInputStream inputStream = new BufferedInputStream(urlConnection.getInputStream());
                 BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
                 String line, result = "";

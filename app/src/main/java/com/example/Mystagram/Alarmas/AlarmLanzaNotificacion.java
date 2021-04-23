@@ -5,13 +5,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import androidx.lifecycle.Observer;
 import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
+
 import androidx.work.WorkManager;
 
 import com.example.Mystagram.WS.firebaseMensajeWS;
-import com.example.Mystagram.WS.subirImagenWS;
+
 
 public class AlarmLanzaNotificacion extends BroadcastReceiver {
     @Override

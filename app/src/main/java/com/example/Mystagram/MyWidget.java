@@ -10,14 +10,10 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.StrictMode;
+
 import android.util.Log;
 import android.widget.RemoteViews;
 
-import androidx.lifecycle.Observer;
-import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkInfo;
-import androidx.work.WorkManager;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -26,13 +22,12 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.Mystagram.Alarmas.AlarmManagerBroadcastReceiver;
-import com.example.Mystagram.GestorFotos.FotoAdapter;
-import com.example.Mystagram.WS.obtenerImagenWS;
+
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
+
 
 import java.net.HttpURLConnection;
 import java.net.URL;
@@ -56,7 +51,8 @@ public class MyWidget extends AppWidgetProvider {
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, AlarmManagerBroadcastReceiver.class);
         PendingIntent pi = PendingIntent.getBroadcast(context, 7475, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        am.setRepeating(AlarmManager.ELAPSED_REALTIME, System.currentTimeMillis(), 60000 , pi);
+        Log.d("alarmaWidget","Se ha inicializado la alarma");
+        am.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis()+ 1000 * 3, 60000 , pi);
     }
     public void onDisabled(Context context){
         AlarmManager am=(AlarmManager)context.getSystemService(Context.ALARM_SERVICE);

@@ -1,7 +1,7 @@
 package com.example.Mystagram;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
+
 import androidx.core.app.NotificationCompat;
 import androidx.core.content.FileProvider;
 import androidx.fragment.app.DialogFragment;
@@ -14,18 +14,17 @@ import androidx.work.WorkInfo;
 import androidx.work.WorkManager;
 
 import android.Manifest;
-import android.app.AlarmManager;
+
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
+
 import android.content.ContentProviderOperation;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.content.res.Configuration;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -33,7 +32,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.LocaleList;
 import android.os.StrictMode;
-import android.os.SystemClock;
+
 import android.preference.PreferenceManager;
 import android.provider.ContactsContract;
 import android.provider.MediaStore;
@@ -42,15 +41,16 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.example.Mystagram.Alarmas.AlarmLanzaNotificacion;
-import com.example.Mystagram.Alarmas.AlarmManagerBroadcastReceiver;
+import com.example.Mystagram.Dialogs.DialogFalloLocalizaciones;
+
 import com.example.Mystagram.Dialogs.DialogPreviewFoto;
 import com.example.Mystagram.Dialogs.DialogAnadirContacto;
 import com.example.Mystagram.Dialogs.DialogProgramarMensaje;
-import com.example.Mystagram.GestorBD.miBD;
+
 import com.example.Mystagram.GestorFotos.FotoAdapter;
 import com.example.Mystagram.WS.firebaseMensajeWS;
 import com.example.Mystagram.WS.obtenerImagenWS;
+import com.example.Mystagram.WS.obtenerLocalizacionWS;
 import com.example.Mystagram.WS.subirImagenWS;
 
 import org.json.simple.JSONArray;
@@ -59,13 +59,12 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 import java.io.File;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
+
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.Locale;
 
@@ -149,9 +148,8 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
                 dialogoPrograma.show(getSupportFragmentManager(), "programaMensaje");
                 break;
             }
-            case R.id.mapas:{ //Ha pulsado preferencias, Abre el activity para modificar las preferencias
-                Intent i = new Intent(getApplicationContext(), ActividadMapa.class);
-                startActivity(i);
+            case R.id.mapas:{ //Ha pulsado
+                obtenerLocalizaciones();
                 break;
             }
         }
@@ -192,9 +190,59 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
             dialogoPreviewFoto.show(getSupportFragmentManager(), "previewFoto");
         }
     }
+    public void onRequestPermissionsResult(int requestCode, String[] permissions,
+                                           int[] grantResults) {
+        //Gestion de permisos
+        if (requestCode == 100) { //Recojo la respuesta del permiso de escritura en contactos
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { //Si se ha dado permiso
+                anadirAContactos(contactUser,telUser);
+            } else { //No se ha dado permiso, muestro un toast indicando que no se ha podido añadir el usuario
+                Toast.makeText(this, getString(R.string.anadirContactoFallo), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    protected void onSaveInstanceState(Bundle outState){ //Guardo los datos del usuario que ha iniciado sesion
+        super.onSaveInstanceState(outState);
+        outState.putString("usuario", usuario);
+        outState.putString("idioma", idioma);
+    }
+    protected void onRestoreInstanceState(Bundle savedInstanceState){
+        super.onRestoreInstanceState(savedInstanceState);
+        usuario = savedInstanceState.getString("usuario");
+        idioma = savedInstanceState.getString("idioma");
+        SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
+        String miidioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
+        LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
+        String idiomaApp=locale.get(0).toString();
+        if (idiomaApp.equals("es")){
+            idiomaApp="ESP";
+        }
+        if (idiomaApp.equals("en")){
+            idiomaApp="ENG";
+        }
+        if (idiomaApp.equals("en_GB")){
+            idiomaApp="ENG";
+        }
+        if (!idiomaApp.equals(miidioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
+            cambiarIdioma(miidioma);
+            idioma=miidioma;
+        }
+
+    }
+    protected void onResume() {
+
+        super.onResume();
+
+        //Si cambia el idioma recargo la pagina
+        String nuevoIdioma=obtenerIdioma();
+        if (!idioma.equals(nuevoIdioma)){
+            recreate();
+        }
+    }
 
     public void tratarListaFotos() {
-        //Obtiene las fotos subidas desde la base de datos
+        //Obtiene las fotos subidas desde la base de datos y las muestra en el RecyclerView
         AppCompatActivity myActivity= this; //Guardo la actividad para enviarla al FotoAdapter
         RecyclerView rv = (RecyclerView)findViewById(R.id.listaFotos);
         //Obtengo las listas (usuarios: Lista con el nombre de usuario que ha subido la foto, fotos: Lista con las fotos subidas, codusuario= Usuario que ha subido la foto
@@ -294,47 +342,6 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         WorkManager.getInstance(getApplicationContext()).enqueue(subirFotoOtwr);
     }
 
-    protected void onSaveInstanceState(Bundle outState){ //Guardo los datos del usuario que ha iniciado sesion
-        super.onSaveInstanceState(outState);
-        outState.putString("usuario", usuario);
-        outState.putString("idioma", idioma);
-    }
-    protected void onRestoreInstanceState(Bundle savedInstanceState){
-        super.onRestoreInstanceState(savedInstanceState);
-        usuario = savedInstanceState.getString("usuario");
-        idioma = savedInstanceState.getString("idioma");
-        SharedPreferences prefs = androidx.preference.PreferenceManager.getDefaultSharedPreferences(this);
-        String miidioma=prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
-        LocaleList locale=getBaseContext().getResources().getConfiguration().getLocales(); //Obtengo el idioma actual de la aplicacion
-        String idiomaApp=locale.get(0).toString();
-        if (idiomaApp.equals("es")){
-            idiomaApp="ESP";
-        }
-        if (idiomaApp.equals("en")){
-            idiomaApp="ENG";
-        }
-        if (idiomaApp.equals("en_GB")){
-            idiomaApp="ENG";
-        }
-        if (!idiomaApp.equals(miidioma)){ //Si el idioma de la app no es el mismo que el de las preferencias lo cambio
-            cambiarIdioma(miidioma);
-            idioma=miidioma;
-        }
-
-    }
-
-
-    protected void onResume() {
-
-        super.onResume();
-
-        //Si cambia el idioma recargo la pagina
-        String nuevoIdioma=obtenerIdioma();
-        if (!idioma.equals(nuevoIdioma)){
-            recreate();
-        }
-    }
-
     private String obtenerIdioma(){ //Obtiene el idioma actual que tiene la aplicacion en preferencias
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         return prefs.getString("idiomaApp","DEF"); //Si no hay ningun idioma devuelve def
@@ -355,44 +362,6 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         recreate();
     }
 
-    private void exportarDatosATxt(){
-        //Exporta los datos de los usuarios de la app a un TXT (BD LOCAL, ya no sirve, opcion desactivada)
-        String texto="CodigoUsuario;CorreoElectronico;NombreCompleto;NumeroFotos"; //Escribo la cabecera del fichero
-        //Obtengo los datos de los usuarios
-        miBD GestorDB = new miBD (getApplicationContext(), "MystragramDB", null, 1);
-        SQLiteDatabase bd = GestorDB.getReadableDatabase();
-        Cursor c = bd.rawQuery("SELECT a.Usuario,a.Correo, a.NombreCompleto, IFNULL(b.numFotos,0) " +
-                                    "FROM Usuarios a LEFT JOIN (SELECT b.usuario, COUNT(1) numFotos " +
-                                                        "FROM FotosUsuario b GROUP BY b.usuario) b " +
-                                    "ON a.Usuario = b.usuario " +
-                                    "ORDER BY a.Usuario", null); //Obtengo los datos de todos los usuarios
-        while (c.moveToNext()) {
-            String codUsuario = c.getString(0); //Usuario
-            String correoUsurio = c.getString(1); //Correo electronico del usuario
-            String nombreusuario = c.getString(2); //NombreCompleto del usuario
-            int numFotos = c.getInt(3); //Numero de fotos subidas por el usuario
-            texto+="\n"+codUsuario+";"+correoUsurio+";"+nombreusuario+";"+numFotos;
-        }
-        //Escribo en el fichero
-        try {
-            OutputStreamWriter fichero = new OutputStreamWriter(openFileOutput("datosUsuarios.txt",
-                    Context.MODE_PRIVATE));
-            fichero.write(texto);
-            fichero.close();
-            //Escritura correcta, informo con un toast
-            Toast toastOK =
-                    Toast.makeText(this,
-                            getString((R.string.exportarDatosOK)), Toast.LENGTH_SHORT);
-            toastOK.show();
-        } catch (IOException e){
-            //Algun error, informo con un toast
-            Toast toastError =
-                    Toast.makeText(this,
-                            getString((R.string.exportarDatosErr)), Toast.LENGTH_SHORT);
-
-            toastError.show();
-            }
-    }
     private void lanzarNotificacionFotoSubida(){
         //Lanza la notificacion de foto subida
         NotificationManager elManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
@@ -413,6 +382,7 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
 
     @Override
     public void anadirAContactos(String usuario, String telefono) {
+        //Añado el usuario y telefono a los contactos
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && this.checkSelfPermission(Manifest.permission.WRITE_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             //Añado los parametros para volver a hacer la llamada despues de pedir permisos
             contactUser=usuario;
@@ -448,25 +418,48 @@ public class ActivityPrincipal extends AppCompatActivity implements DialogPrevie
         }
     }
 
-    public void onRequestPermissionsResult(int requestCode, String[] permissions,
-                                           int[] grantResults) {
-        //Gestion de permisos
-        if (requestCode == 100) { //Recojo la respuesta del permiso de escritura en contactos
-            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) { //Si se ha dado permiso
-                anadirAContactos(contactUser,telUser);
-            } else { //No se ha dado permiso, muestro un toast indicando que no se ha podido añadir el usuario
-                Toast.makeText(this, getString(R.string.anadirContactoFallo), Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
 
-    public void lanzarNotificacion(){
+    private void lanzarNotificacion(){
+        //Lanza una mensaje por Firebase
         OneTimeWorkRequest lanzarNotiOtwr= new OneTimeWorkRequest.Builder(firebaseMensajeWS.class)
                 .build();
         WorkManager.getInstance(getApplicationContext()).enqueue(lanzarNotiOtwr);
         Toast.makeText(getApplicationContext(), getString(R.string.lanzadaNoti), Toast.LENGTH_SHORT).show();
     }
 
+    private void obtenerLocalizaciones(){
+        //Obtiene la geolocalizacion de los usuarios y lanza la actividad de Google Maps
+        OneTimeWorkRequest obtenerLocalizacionOtwr= new OneTimeWorkRequest.Builder(obtenerLocalizacionWS.class)
+                .build();
+        WorkManager.getInstance(this).getWorkInfoByIdLiveData(obtenerLocalizacionOtwr.getId())
+                .observe(this, new Observer<WorkInfo>() {
+                    @Override
+                    public void onChanged(WorkInfo workInfo) {
+                        //Trato la respuesta
+                        if(workInfo != null && workInfo.getState().isFinished()){
+                            String resultado=workInfo.getOutputData().getString("resultado");
+                            if (resultado.equals("-1") ){ //Fallo de BD
+                                Log.d("obtenerFotos","Error al obtener localizaciones del servidor");
+                                DialogFragment dialogoErrorBD= DialogFalloLocalizaciones.newInstance(getString(R.string.locAlertErrorBD));
+                                dialogoErrorBD.show(getSupportFragmentManager(), "errorBDDialog");
+                            }
+                            else{ //Tengo el JSON con los datos
+                                if (resultado.equals("[]")){ //Si es lista vacia
+                                    Log.d("obtenerFotos","No hay localizaciones");
+                                    DialogFragment dialogoNoLocali= DialogFalloLocalizaciones.newInstance(getString(R.string.locAlertErrorNoLoc));
+                                    dialogoNoLocali.show(getSupportFragmentManager(), "errorNoLocali");
+                                }
+                                else{//Si no, lanzo la actividad mapa
+                                    Intent i = new Intent(getApplicationContext(), ActividadMapa.class);
+                                    i.putExtra("datos",resultado);
+                                    startActivity(i);
+                                }
+                            }
+                        }
+                    }
+                });
+        WorkManager.getInstance(getApplicationContext()).enqueue(obtenerLocalizacionOtwr);
+    }
 }
 
 

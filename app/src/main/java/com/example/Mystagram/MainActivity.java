@@ -1,6 +1,6 @@
 package com.example.Mystagram;
 
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.DialogFragment;
 import androidx.lifecycle.Observer;
@@ -17,7 +17,7 @@ import android.content.res.Configuration;
 
 import android.os.Bundle;
 import android.os.LocaleList;
-import android.util.Log;
+;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,9 +26,7 @@ import com.example.Mystagram.Dialogs.DialogFalloLogin;
 import com.example.Mystagram.Dialogs.DialogLoginNoExiste;
 
 import com.example.Mystagram.WS.inicioSesionWS;
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.messaging.FirebaseMessaging;
+
 
 import java.util.Locale;
 
